@@ -37,11 +37,24 @@ describe("T1 scam text, no notice", () => {
 describe("T2 real notice on account", () => {
   it("returns GENUINE_NOTICE_FOUND and offers no report", async () => {
     const { deps } = setup();
-    const res = await verify(deps, { message: cleanNorthline, demo_account: REAL_ACCOUNT });
+    const res = await verify(deps, { message: cleanNorthline, demo_account: REAL_ACCOUNT, sender: "NLPOWER" });
     expectValidVerdictShape(res);
     expect(res.body.verdict).toBe("GENUINE_NOTICE_FOUND");
     expect(res.body.next_step as string).not.toMatch(/report/i);
     expect(res.body.report_count).toBe(0);
+  });
+});
+
+describe("T2b notice on account needs an official sender", () => {
+  it.each([
+    ["unknown sender", { sender: "+1 555 0199" }],
+    ["no sender", {}],
+  ])("%s is never GENUINE", async (_name, extra) => {
+    const { deps } = setup();
+    const res = await verify(deps, { message: cleanNorthline, demo_account: REAL_ACCOUNT, ...extra });
+    expectValidVerdictShape(res);
+    expect(res.body.verdict).toBe("NO_MATCHING_NOTICE");
+    expect(res.body.next_step as string).toContain("official channels");
   });
 });
 

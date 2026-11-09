@@ -15,7 +15,7 @@
 
 ## Known gaps (documented, not fixed yet)
 - Proof Code: no expiry, no one-time use, no rate limit on wrong guesses. A code can be reused and guessed (10,000 possible codes per company).
-- "Matching notice" means the demo account has a notice on file. It is not text similarity with the pasted message.
+- "Matching notice" means the demo account has a notice on file. It is not text similarity with the pasted message. GENUINE now also needs a valid Proof Code or a supplied sender on the company's official allowlist (fixed: a notice with a missing or non-official sender returns NO_MATCHING_NOTICE). Remaining gap: the sender is user-supplied and could be spoofed, so a notice plus an allowlisted sender is still not proof of origin; the Proof Code is the stronger check.
 - Verify has no timeout simulation. T8 covers the 500 path only.
 - Memory storage only. No Supabase, HTTP adapter, console endpoints, reset or knowledge draft yet.
 

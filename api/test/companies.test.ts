@@ -40,9 +40,9 @@ describe("company names and contacts are clearly fictional", () => {
 
 describe("T18 three company configs", () => {
   const cases = [
-    { id: "northline", scam: scamNorthline, account: "DEMO-NP-1001", code: "NP-4821", own: "northline.example" },
-    { id: "examplia_bank", scam: scamBank, account: "DEMO-EB-2001", code: "EB-7314", own: "examplia-bank.example" },
-    { id: "examplia_mobile", scam: scamMobile, account: "DEMO-EM-3001", code: "EM-5528", own: "examplia-mobile.example" },
+    { id: "northline", scam: scamNorthline, account: "DEMO-NP-1001", code: "NP-4821", own: "northline.example", official: "NLPOWER" },
+    { id: "examplia_bank", scam: scamBank, account: "DEMO-EB-2001", code: "EB-7314", own: "examplia-bank.example", official: "EXAMPLIABANK" },
+    { id: "examplia_mobile", scam: scamMobile, account: "DEMO-EM-3001", code: "EM-5528", own: "examplia-mobile.example", official: "EXAMPLIAMOBILE" },
   ];
   const clean = "A routine update from us. See our website for details.";
 
@@ -56,10 +56,10 @@ describe("T18 three company configs", () => {
     for (const other of cases.filter((c) => c.id !== id)) expect(step).not.toContain(other.own);
   });
 
-  it.each(cases)("$id: valid Proof Code or account notice gives GENUINE, nothing else does", async ({ id, account, code }) => {
+  it.each(cases)("$id: valid Proof Code or account notice gives GENUINE, nothing else does", async ({ id, account, code, official }) => {
     const { deps } = setup();
     expect((await verify(deps, { company_id: id, message: clean, proof_code: code })).body.verdict).toBe("GENUINE_NOTICE_FOUND");
-    expect((await verify(deps, { company_id: id, message: clean, demo_account: account })).body.verdict).toBe("GENUINE_NOTICE_FOUND");
+    expect((await verify(deps, { company_id: id, message: clean, demo_account: account, sender: official })).body.verdict).toBe("GENUINE_NOTICE_FOUND");
     expect((await verify(deps, { company_id: id, message: clean })).body.verdict).toBe("NO_MATCHING_NOTICE");
     expect((await verify(deps, { company_id: id, message: clean, proof_code: "XX-0000" })).body.verdict).toBe("NO_MATCHING_NOTICE");
   });

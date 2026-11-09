@@ -42,6 +42,7 @@ export interface VerdictFacts {
   signals: DetectedSignal[];
   proof: ProofState;
   accountNotice: boolean;
+  senderOfficial: boolean; // a sender was supplied and is on the company's official allowlist
 }
 
 export interface VerdictResult {

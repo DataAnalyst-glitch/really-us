@@ -41,6 +41,8 @@ const BAD_CODE_FACT = "The Proof Code does not match a real notice.";
 const BAD_CODE_RULE = "A wrong Proof Code means this message cannot be confirmed as genuine.";
 const GOOD_CODE_FACT = "The Proof Code matches a real notice.";
 const ACCOUNT_NOTICE_FACT = "A notice is on file for this account.";
+const OFFICIAL_SENDER_FACT = "The sender is on the official sender list.";
+const SENDER_UNCONFIRMED_FACT = "The sender could not be confirmed as an official one.";
 const ONE_NOTICE_ONLY_FACT = "This check confirms that one notice only.";
 const WARNING_BEATS_NOTICE_RULE = "A code or notice does not make a message with these warning signs genuine.";
 
@@ -51,11 +53,12 @@ function channelsText(config: CompanyConfig): string {
 // Order of rules (after the TESTFAIL error, which is handled before this function):
 // 2. invalid Proof Code -> never GENUINE
 // 3. scam signs -> MATCHES_SCAM_SIGNS, even if a notice or valid code exists
-// 4. notice or valid code, no scam signs -> GENUINE_NOTICE_FOUND
+// 4. no scam signs, and a valid code OR (account notice AND official sender) -> GENUINE_NOTICE_FOUND
+// 4b. account notice but sender missing or not official -> NO_MATCHING_NOTICE
 // 5. otherwise NO_MATCHING_NOTICE
 // Every reason comes from a signal that was really detected or a check that really ran.
 export function decideVerdict(config: CompanyConfig, facts: VerdictFacts): VerdictResult {
-  const { signals, proof, accountNotice } = facts;
+  const { signals, proof, accountNotice, senderOfficial } = facts;
   const signalReasons = signals.map((s) => s.reason);
   const noticeExists = proof === "valid" || accountNotice;
   const channels = channelsText(config);
@@ -91,18 +94,28 @@ export function decideVerdict(config: CompanyConfig, facts: VerdictFacts): Verdi
     return { verdict: "MATCHES_SCAM_SIGNS", reasons: reasons.slice(0, 3), next_step: scamNextStep };
   }
 
-  // Rule 4: a notice or a valid code, and no scam signs.
-  if (noticeExists) {
+  // Rule 4: no scam signs, and either a valid code, or an account notice plus an official sender.
+  const accountConfirmed = accountNotice && senderOfficial;
+  if (proof === "valid" || accountConfirmed) {
     const reasons = [
       NO_SCAM_FACT,
       ...(proof === "valid" ? [GOOD_CODE_FACT] : []),
-      ...(accountNotice ? [ACCOUNT_NOTICE_FACT] : []),
+      ...(accountConfirmed ? [ACCOUNT_NOTICE_FACT, OFFICIAL_SENDER_FACT] : []),
       ONE_NOTICE_ONLY_FACT,
     ];
     return {
       verdict: "GENUINE_NOTICE_FOUND",
       reasons: reasons.slice(0, 3),
       next_step: `This matches a real ${name} notice. You can still confirm it through the official channels: ${channels}.`,
+    };
+  }
+
+  // Rule 4b: a notice is on file but the sender could not be confirmed. Never GENUINE.
+  if (accountNotice) {
+    return {
+      verdict: "NO_MATCHING_NOTICE",
+      reasons: [NO_SCAM_FACT, ACCOUNT_NOTICE_FACT, SENDER_UNCONFIRMED_FACT],
+      next_step: `We could not confirm who sent this. Do not act on it yet. Check with ${name} only through its official channels: ${channels}.`,
     };
   }
 

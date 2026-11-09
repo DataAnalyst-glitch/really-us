@@ -129,7 +129,8 @@ export async function handleVerify(deps: Deps, body: unknown): Promise<ApiResult
       : undefined;
   const proof = checkProofCode(config, suppliedCode, codeNotice);
   const accountNotice = demo_account ? (await deps.storage.findNoticeByAccount(config.company_id, demo_account)) !== undefined : false;
-  const decision = decideVerdict(config, { signals, proof, accountNotice });
+  const senderOfficial = nonEmpty(sender) && isOfficialSender(config, hashSender(sender));
+  const decision = decideVerdict(config, { signals, proof, accountNotice, senderOfficial });
 
   let sender_hash: string | null = null;
   let report_count = 0;

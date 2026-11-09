@@ -7,18 +7,21 @@ import type { DetectedSignal, ProofState } from "../src/types.js";
 const signal: DetectedSignal = { id: "x", reason: "It asks for a one-time password, PIN, card number or bank login." };
 
 describe("decideVerdict rule order", () => {
-  const table: Array<[string, { signals: DetectedSignal[]; proof: ProofState; accountNotice: boolean }, string]> = [
-    ["nothing at all", { signals: [], proof: "absent", accountNotice: false }, "NO_MATCHING_NOTICE"],
-    ["scam signs only", { signals: [signal], proof: "absent", accountNotice: false }, "MATCHES_SCAM_SIGNS"],
-    ["account notice only", { signals: [], proof: "absent", accountNotice: true }, "GENUINE_NOTICE_FOUND"],
-    ["valid code only", { signals: [], proof: "valid", accountNotice: false }, "GENUINE_NOTICE_FOUND"],
-    ["scam signs + account notice", { signals: [signal], proof: "absent", accountNotice: true }, "MATCHES_SCAM_SIGNS"],
-    ["scam signs + valid code", { signals: [signal], proof: "valid", accountNotice: false }, "MATCHES_SCAM_SIGNS"],
-    ["scam signs + valid code + notice", { signals: [signal], proof: "valid", accountNotice: true }, "MATCHES_SCAM_SIGNS"],
-    ["invalid code, no signs", { signals: [], proof: "invalid", accountNotice: false }, "NO_MATCHING_NOTICE"],
-    ["invalid code + account notice", { signals: [], proof: "invalid", accountNotice: true }, "NO_MATCHING_NOTICE"],
-    ["invalid code + signs", { signals: [signal], proof: "invalid", accountNotice: false }, "MATCHES_SCAM_SIGNS"],
-    ["invalid code + signs + notice", { signals: [signal], proof: "invalid", accountNotice: true }, "MATCHES_SCAM_SIGNS"],
+  const table: Array<[string, { signals: DetectedSignal[]; proof: ProofState; accountNotice: boolean; senderOfficial: boolean }, string]> = [
+    ["nothing at all", { signals: [], proof: "absent", accountNotice: false, senderOfficial: false }, "NO_MATCHING_NOTICE"],
+    ["scam signs only", { signals: [signal], proof: "absent", accountNotice: false, senderOfficial: false }, "MATCHES_SCAM_SIGNS"],
+    ["account notice, no official sender", { signals: [], proof: "absent", accountNotice: true, senderOfficial: false }, "NO_MATCHING_NOTICE"],
+    ["account notice + official sender", { signals: [], proof: "absent", accountNotice: true, senderOfficial: true }, "GENUINE_NOTICE_FOUND"],
+    ["official sender alone", { signals: [], proof: "absent", accountNotice: false, senderOfficial: true }, "NO_MATCHING_NOTICE"],
+    ["scam signs + notice + official sender", { signals: [signal], proof: "absent", accountNotice: true, senderOfficial: true }, "MATCHES_SCAM_SIGNS"],
+    ["valid code only", { signals: [], proof: "valid", accountNotice: false, senderOfficial: false }, "GENUINE_NOTICE_FOUND"],
+    ["scam signs + account notice", { signals: [signal], proof: "absent", accountNotice: true, senderOfficial: false }, "MATCHES_SCAM_SIGNS"],
+    ["scam signs + valid code", { signals: [signal], proof: "valid", accountNotice: false, senderOfficial: false }, "MATCHES_SCAM_SIGNS"],
+    ["scam signs + valid code + notice", { signals: [signal], proof: "valid", accountNotice: true, senderOfficial: false }, "MATCHES_SCAM_SIGNS"],
+    ["invalid code, no signs", { signals: [], proof: "invalid", accountNotice: false, senderOfficial: false }, "NO_MATCHING_NOTICE"],
+    ["invalid code + account notice", { signals: [], proof: "invalid", accountNotice: true, senderOfficial: false }, "NO_MATCHING_NOTICE"],
+    ["invalid code + signs", { signals: [signal], proof: "invalid", accountNotice: false, senderOfficial: false }, "MATCHES_SCAM_SIGNS"],
+    ["invalid code + signs + notice", { signals: [signal], proof: "invalid", accountNotice: true, senderOfficial: false }, "MATCHES_SCAM_SIGNS"],
   ];
 
   it.each(table)("%s", (_name, facts, expected) => {
@@ -30,8 +33,33 @@ describe("decideVerdict rule order", () => {
   });
 
   it("is deterministic: same facts, same answer", () => {
-    const facts = { signals: [signal], proof: "valid" as const, accountNotice: true };
+    const facts = { signals: [signal], proof: "valid" as const, accountNotice: true, senderOfficial: true };
     expect(decideVerdict(northline, facts)).toEqual(decideVerdict(northline, facts));
+  });
+});
+
+describe("GENUINE needs a valid Proof Code, or a notice plus an official sender", () => {
+  it("notice on file + unknown sender + polite message is never GENUINE", () => {
+    const r = decideVerdict(northline, { signals: [], proof: "absent", accountNotice: true, senderOfficial: false });
+    expect(r.verdict).toBe("NO_MATCHING_NOTICE");
+    expect(r.reasons.join(" ")).toMatch(/sender could not be confirmed/i);
+    expect(r.next_step).toContain("official channels");
+  });
+
+  it("notice on file + no sender is never GENUINE", () => {
+    const r = decideVerdict(northline, { signals: [], proof: "absent", accountNotice: true, senderOfficial: false });
+    expect(r.verdict).not.toBe("GENUINE_NOTICE_FOUND");
+    expect(r.next_step).toContain("official channels");
+  });
+
+  it("notice on file + official sender + no scam signs is GENUINE", () => {
+    const r = decideVerdict(northline, { signals: [], proof: "absent", accountNotice: true, senderOfficial: true });
+    expect(r.verdict).toBe("GENUINE_NOTICE_FOUND");
+  });
+
+  it("valid Proof Code + no scam signs is GENUINE, sender not needed", () => {
+    const r = decideVerdict(northline, { signals: [], proof: "valid", accountNotice: false, senderOfficial: false });
+    expect(r.verdict).toBe("GENUINE_NOTICE_FOUND");
   });
 });
 
