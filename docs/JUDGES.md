@@ -12,6 +12,7 @@ Status values: PLANNED, BUILT, VERIFIED. Update with evidence links as work comp
 | Actions | Reports and cases via API | BUILT | `api/test/writes.test.ts`, `api/test/http.test.ts`. Report and case flows ran in chat and returned a report reference and a case number (owner, 2026-11-10). "Actions enabled and added to the AI Agent" is not recorded |
 | Validation in Test AI Agent and demo link | `docs/TEST_PLAN.md` | BUILT | "Run on 2026-11-10" lists the chats run: Part A (7 cases) and R-T1 to R-T16, with FAILs that are one finding (the demo failure triggers cannot be reached from chat). The full T1-T23 run is NOT done |
 | Fictional data, authorized content | `knowledge/`, API fixtures | BUILT | `api/src/fixtures.ts`, `api/src/companies/`, `console/index.html` |
+| Second fictional company, Examplia Bank (beyond the checklist) | `egain/workflows.md` (Verify Bank Message) | VERIFIED | API test and chat checks passed on 2026-11-10 (owner): bank scam message answered with Examplia Bank channels; Northline scam, report and Proof Code unchanged. Verify flow only; same agent and Northline-written Pre-chat greeting |
 | Outbreak, Trust Console, Scam Vaccine, Knowledge Loop (beyond the checklist) | `api/src/console.ts`, `console/trust.html` | BUILT | `api/test/console.test.ts`, `api/test/http-console.test.ts`, `api/test/console-pages.test.ts`. Outbreak end to end verified in production (owner, 2026-11-10): 3 chat sessions, Suspected, person approval, warning shown to the next customer, draft created and approved |
 | 150 words and 1-minute video | `docs/SUBMISSION.md` | PLANNED | |
 
@@ -29,7 +30,7 @@ Status values: PLANNED, BUILT, VERIFIED. Update with evidence links as work comp
 Open the Demo Link in README.md (no code needed).
 1. Paste the fake 9:30 message for a demo account with no notice.
 2. Use Proof Code `NP-4821` on the matching demo notice (shown on the fictional Northline home page).
-3. Say "I already paid". 4. Ask something off topic.
+3. Say "I already paid". 4. Ask something off topic. 5. Ask to check a message from your bank (second fictional company, Examplia Bank; verify flow only).
 Allow up to 5 minutes after publishing for changes to appear.
 
 ## Try the Trust Console (live)
@@ -45,6 +46,8 @@ Allow up to 5 minutes after publishing for changes to appear.
 - The customer reference used for outbreak counting is the chat session id, so one person opening three chats could trigger an outbreak.
 - Alerts are simulated. Nobody is contacted. Approving a knowledge draft records the human approval only; nothing is uploaded to eGain knowledge.
 - The demo failure paths (`TESTFAIL`, `TESTFAILWRITE`) trigger by `company_id` only, so they are verified by unit tests and direct API calls, not from the chat. The Report Message success condition (`status === 200 && body.success === true`) is published in v2 and was tested with a normal report reference.
+- The keys `rep-{{sessionId}}` and `case-{{sessionId}}` repeat inside one chat. A second report or case in the same chat with different details is rejected by the API (409), and the customer sees the error text.
+- The Report body sends a `message` field. The API ignores it and does not store it.
 - Two requests with the same new idempotency key at the same instant are not atomic. The eGain Test panel hides some mapped values.
 - The full T1-T23 run on eGain is not done yet.
 - Not done yet: the video, the final description edit, the submission channel, participant information and the terms review.

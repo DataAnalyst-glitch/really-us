@@ -38,6 +38,7 @@ lets them ask the only party that knows: the company named in the message.
 | Storage (Netlify Blobs) | Running in production; reports, cases and outbreaks persisted (owner-verified 2026-11-10) |
 | Trust Console (`console/trust.html`) and demo home page (`console/index.html`) | Running in production; outbreak approval and draft approval done in it |
 | eGain agent and workflows | Published and run in chat (owner-verified 2026-11-10). Facts are recorded in `egain/` and `docs/TEST_PLAN.md`; they cannot be re-checked from this repo |
+| Second fictional company (Examplia Bank) | Works in eGain through the Process "Verify Bank Message" and the intent "Check a message from my bank" (owner-verified 2026-11-10). Verify flow only; report, case and Proof Code flows are Northline only. Same agent and same Pre-chat greeting, which is written for Northline |
 | Full test run (T1-T23) on eGain | Not done. Only the chats listed in `docs/TEST_PLAN.md` under "Run on 2026-11-10" were run |
 | Video, final description, submission channel, participant info, license | Not done |
 
@@ -54,6 +55,8 @@ Note: After creation the eGain settings box shows an empty URL field, but the De
 - The customer reference used for outbreak counting is the chat session id, so one person opening three chats could trigger an outbreak.
 - Alerts are simulated. Nobody is contacted. Approving a knowledge draft records the human approval only; nothing is uploaded to eGain knowledge.
 - The demo failure paths (`TESTFAIL`, `TESTFAILWRITE`) trigger by `company_id` only, so they are verified by unit tests and direct API calls, not from the chat. The Report Message success condition (`status === 200 && body.success === true`) is published in v2 and was tested with a normal report reference.
+- The keys `rep-{{sessionId}}` and `case-{{sessionId}}` repeat inside one chat. A second report or case in the same chat with different details is rejected by the API (409), and the customer sees the error text.
+- The Report body sends a `message` field. The API ignores it and does not store it.
 - Two requests with the same new idempotency key at the same instant are not atomic. The eGain Test panel hides some mapped values.
 - The full T1-T23 run on eGain is not done yet.
 

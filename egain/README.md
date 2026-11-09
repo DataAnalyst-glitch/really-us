@@ -19,7 +19,7 @@ Mark each platform fact ASSUMPTION or VERIFIED.
 |---|---|---|
 | AI Agent | Really Us Message Verifier | [agent-settings.md](agent-settings.md) |
 | Pre-chat workflow | Really Us Pre-chat | [pre-chat.md](pre-chat.md) |
-| Process workflows | Verify Message (v3), Verify With Proof Code, Report Message, Open Case | [workflows.md](workflows.md) |
+| Process workflows | Verify Message (v3), Verify With Proof Code, Report Message, Open Case, and Verify Bank Message (second company, Examplia Bank) | [workflows.md](workflows.md) |
 | Escalation workflow | Really Us Escalation | [escalation.md](escalation.md) |
 | External Credential | `really-us-api-key` (the value is never recorded here) | [workflows.md](workflows.md) |
 
@@ -27,3 +27,6 @@ Mark each platform fact ASSUMPTION or VERIFIED.
 - No API was found to create knowledge articles. Content is added through Point to Content: files, a website crawl, or a portal.
 - The Knowledge Loop therefore stops at a human-approved draft in the Trust Console. Nothing is uploaded to eGain knowledge by this project.
 - Idea, NOT built: publish approved articles on a `/kb/` page with a sitemap, then crawl that page from eGain.
+
+## Second fictional company (verified 2026-11-10, owner)
+Examplia Bank works in the same agent through the Process workflow "Verify Bank Message" and the intent "Check a message from my bank". It is a copy of Verify Message v3 whose body sends `"company_id":"examplia_bank"`. The Pre-chat greeting is still the one written for Northline Power. Only the verify flow exists for the bank; the report, case and Proof Code flows are Northline only. Details and test results: [workflows.md](workflows.md) and `docs/TEST_PLAN.md`.
