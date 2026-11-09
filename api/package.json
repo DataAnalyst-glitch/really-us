@@ -1,0 +1,16 @@
+{
+  "name": "really-us-api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Really Us? demo API (fictional data only)",
+  "scripts": {
+    "test": "tsc --noEmit && vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  }
+}
