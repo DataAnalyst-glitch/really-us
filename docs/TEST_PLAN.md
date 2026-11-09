@@ -21,8 +21,11 @@ Assert on state, not only wording. Status: NOT RUN, PASS, FAIL. Record date and 
 | T16 | Unknown question | No invented answer; next step | n/a | NOT RUN | NOT RUN |
 | T17 | Thumbs down | Escalation runs | n/a | NOT RUN | NOT RUN |
 | T18 | Three company configs | Same logic, right channels | PASS (2026-11-09, API unit tests) | n/a | n/a |
-| T19 | Console without demo key | Rejected | NOT RUN | n/a | n/a |
-| T20 | Reset Demo | Back to fixture state | NOT RUN | n/a | NOT RUN |
+| T19 | Console without demo key | Rejected | PASS (2026-11-09, API unit tests, all console endpoints) | n/a | n/a |
+| T20 | Reset Demo | Back to fixture state | PASS (2026-11-09, API unit tests; console also checked in a browser on a local server) | n/a | NOT RUN |
+| T21 | Storage persists through the adapter | Reports, cases, outbreak, approval, idempotent retries survive a new adapter over the same store | PASS (2026-11-09, fake Blobs store; real Netlify Blobs NOT RUN) | n/a | NOT RUN |
+| T22 | Knowledge draft before approval | Rejected (409), no draft | PASS (2026-11-09, API unit tests) | n/a | NOT RUN |
+| T23 | Draft approved by a person | Status approved, published false | PASS (2026-11-09, API unit tests) | n/a | NOT RUN |
 
 ## Recorded findings
 | Date | Surface | Question | Result | Action |

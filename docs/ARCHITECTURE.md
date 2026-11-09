@@ -9,7 +9,7 @@ Customer -> Northline demo page -> eGain widget
                          |            |              |
                      API verify   Confirm step   API report/case
                                     |
-                            Really Us Demo API  <-> Postgres (fixtures, reports, cases, audit)
+                            Really Us Demo API  <-> Netlify Blobs (reports, cases, outbreaks, drafts, audit)
                                     |
                        Trust Console (human approves outbreak and knowledge draft)
                                     |

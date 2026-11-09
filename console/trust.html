@@ -17,7 +17,9 @@
     label { display: block; font-weight: 600; margin-bottom: 4px; }
     input { min-height: 44px; font: inherit; padding: 6px 10px; border: 2px solid var(--navy); border-radius: 6px; width: 260px; max-width: 100%; }
     button { min-height: 44px; min-width: 44px; font: inherit; font-weight: 700; padding: 8px 16px; border-radius: 6px; border: 2px solid var(--teal); background: var(--teal); color: #fff; cursor: pointer; }
-    button:hover:not(:disabled) { background: var(--teal-dark); border-color: var(--teal-dark); }
+    button:not(.plain):not(.warn):hover:not(:disabled) { background: var(--teal-dark); border-color: var(--teal-dark); }
+    button.plain:hover:not(:disabled) { background: #e2e8f0; }
+    button.warn:hover:not(:disabled) { background: #fee2e2; }
     button.plain { background: #fff; color: var(--navy); border-color: var(--navy); }
     button.warn { background: #fff; color: #7f1d1d; border-color: #7f1d1d; }
     button:disabled { opacity: .55; cursor: not-allowed; }
@@ -308,7 +310,7 @@
     var btn = $("reset-btn");
     if (!resetArmed) {
       btn.textContent = "Confirm: clear all demo data";
-      resetArmed = setTimeout(function () { resetArmed = null; btn.textContent = "Reset Demo"; }, 6000);
+      resetArmed = setTimeout(function () { resetArmed = null; btn.textContent = "Reset Demo"; }, 8000);
       return;
     }
     clearTimeout(resetArmed);
