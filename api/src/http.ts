@@ -3,6 +3,7 @@ import { createBlobsStorage, type BlobStoreLike } from "./blobs-storage.js";
 import { demoKeyOk, handleApproveDraft, handleConsoleState, handleCreateDraft, handleReset } from "./console.js";
 import { handleApproveOutbreak, handleCase, handleReport, handleSenderLookup, handleVerify, type Deps } from "./handlers.js";
 import { createMemoryStorage } from "./storage.js";
+import { chooseBackend, probeRuntime } from "./storage-select.js";
 import type { ApiResult, Storage } from "./types.js";
 
 // Thin HTTP adapter. It parses the request, checks the method and key, calls an existing
@@ -28,37 +29,39 @@ export interface FunctionContext {
 
 type Env = Record<string, string | undefined>;
 
-// On Netlify the demo data lives in Netlify Blobs, because memory does not persist between serverless
-// invocations. Locally and in tests it is memory. STORAGE_BACKEND=blobs|memory forces a choice.
-// If Blobs fails there is no silent fallback to memory: the request returns SERVER_ERROR.
-let storagePromise: Promise<Storage> | undefined;
+// Storage backend. On Netlify it is always Netlify Blobs (memory does not persist between invocations);
+// locally and in tests it is memory. See api/src/storage-select.ts for the rule and the evidence.
+// If Blobs cannot be used the request fails with SERVER_ERROR. There is no silent fallback to memory.
+let memoryStorage: Storage | undefined;
+let storageOverride: Storage | undefined; // tests only
 
-function useBlobs(env: Env): boolean {
-  if (env.STORAGE_BACKEND === "blobs") return true;
-  if (env.STORAGE_BACKEND === "memory") return false;
-  return Boolean(env.NETLIFY_BLOBS_CONTEXT);
-}
-
-function getStorage(env: Env): Promise<Storage> {
-  storagePromise ??= (async () => {
-    if (!useBlobs(env)) return createMemoryStorage();
-    const { getStore } = await import("@netlify/blobs");
-    return createBlobsStorage(getStore({ name: "really-us-demo", consistency: "strong" }) as unknown as BlobStoreLike);
-  })().catch((err) => {
-    storagePromise = undefined;
-    throw err;
-  });
-  return storagePromise;
+async function getStorage(env: Env): Promise<Storage> {
+  if (storageOverride) return storageOverride;
+  if (chooseBackend(probeRuntime(env)) === "memory") {
+    memoryStorage ??= createMemoryStorage();
+    return memoryStorage;
+  }
+  // A Blobs store is made per request: the runtime sets the Blobs context (site, token) on every
+  // invocation, so a store kept from an earlier invocation could hold an expired token.
+  const { getStore } = await import("@netlify/blobs");
+  return createBlobsStorage(getStore({ name: "really-us-demo", consistency: "strong" }) as unknown as BlobStoreLike);
 }
 
 export function resetStorageForTests(): void {
-  storagePromise = Promise.resolve(createMemoryStorage());
+  storageOverride = undefined;
+  memoryStorage = createMemoryStorage();
 }
 export function forgetStorageForTests(): void {
-  storagePromise = undefined;
+  storageOverride = undefined;
+  memoryStorage = undefined;
 }
 export function useStorageForTests(storage: Storage): void {
-  storagePromise = Promise.resolve(storage);
+  storageOverride = storage;
+}
+
+export function describeError(err: unknown): [string, string] {
+  if (!(err instanceof Error)) return ["unknown", ""];
+  return [err.name, String(err.message).replace(/\s+/g, " ").slice(0, 300)];
 }
 
 function json(status: number, body: Record<string, unknown>, extra: Record<string, string> = {}): Response {
@@ -108,8 +111,9 @@ export async function serve(req: Request, params: Record<string, string>, route:
     });
     return json(result.status, result.body);
   } catch (err) {
-    // Log the error type only. Never return a stack trace or message to the caller.
-    console.error("function_error", err instanceof Error ? err.name : "unknown");
+    // The caller gets only SERVER_ERROR. The log gets the error name and message so a failure is visible.
+    // Never log the request body, headers, keys or a stack trace.
+    console.error("function_error", ...describeError(err));
     return fail(500, "SERVER_ERROR");
   }
 }

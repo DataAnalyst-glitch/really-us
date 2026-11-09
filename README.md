@@ -44,6 +44,8 @@ lets them ask the only party that knows: the company named in the message.
 ## Run
 `make verify` runs the harness checks and tests. Keys are set as environment variables (`API_KEY`, `DEMO_KEY`, `DEMO_DATA_ONLY`); see `.env.example` for the names. Never commit values.
 
+Deploy note: the functions need `@netlify/blobs` resolvable from the repo root. Run `npm install` in the repo root (not only in `api/`) before a CLI deploy. A Netlify build runs `npm ci --omit=dev` itself.
+
 ## AI use and disclosure
 Built with Claude Code and other AI tools, as the rules permit. The author reviewed and can explain the solution.
 Pre-existing templates, code or third-party assets are listed in `docs/DECISIONS.md`.
