@@ -62,6 +62,9 @@ lets them ask the only party that knows: the company named in the message.
 
 Deploy note: the functions need `@netlify/blobs` resolvable from the repo root. Run `npm install` in the repo root (not only in `api/`) before a CLI deploy. A Netlify build runs `npm ci --omit=dev` itself.
 
+## License
+MIT, see [LICENSE](LICENSE). Copyright (c) 2026 Venkateswara Rao Pathuri. The demo data is fictional, and so are the names Northline Power, Examplia Bank and Examplia Mobile.
+
 ## AI use and disclosure
 Built with Claude Code and other AI tools, as the rules permit. The author reviewed and can explain the solution.
 Pre-existing templates, code or third-party assets are listed in `docs/DECISIONS.md`.
