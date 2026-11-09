@@ -1,4 +1,6 @@
 [build]
+  # Installs api/ dependencies (@netlify/blobs) for builds on Netlify. A CLI deploy does not run this.
+  command = "npm --prefix api ci --omit=dev"
   functions = "netlify/functions"
 
 [functions]
