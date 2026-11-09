@@ -1,7 +1,6 @@
 [build]
-  # Installs api/ dependencies (@netlify/blobs) for builds on Netlify. A CLI deploy does not run this.
-  command = "npm --prefix api ci --omit=dev"
+  # Installs the functions' runtime dependency (@netlify/blobs) at the repo root, where the function
+  # bundler can find it. Netlify builds run this; a CLI deploy does not, so run `npm install` in the
+  # repo root before `netlify deploy`. (Functions v2 are bundled with nft: node_modules must resolve from here.)
+  command = "npm ci --omit=dev"
   functions = "netlify/functions"
-
-[functions]
-  node_bundler = "esbuild"

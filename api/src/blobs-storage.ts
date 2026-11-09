@@ -114,7 +114,7 @@ export function createBlobsStorage(store: BlobStoreLike, notices: Notice[] = fix
     // No shared counter across invocations, so ids are time-ordered with a random tail.
     nextId(prefix) {
       seq += 1;
-      return `${prefix}-${Date.now().toString(36).padStart(9, "0")}${seq.toString(36).padStart(4, "0")}${randomBytes(2).toString("hex")}`;
+      return `${prefix}-${Date.now().toString(36).padStart(9, "0")}${seq.toString(36).padStart(4, "0")}${randomBytes(4).toString("hex")}`;
     },
   };
 }

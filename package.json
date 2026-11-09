@@ -1,0 +1,9 @@
+{
+  "name": "really-us",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Deploy-time dependencies for the Netlify Functions in netlify/functions. The API code and tests live in api/.",
+  "dependencies": {
+    "@netlify/blobs": "11.1.6"
+  }
+}
