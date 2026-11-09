@@ -37,7 +37,7 @@ describe("customer_text on /v1/verify", () => {
     const { deps } = setup();
     const res = await verify(deps, { ...cases[2].body });
     const text = (res.body.customer_text as string).toLowerCase();
-    // "No scam warning signs were found" is a reassuring reason, so only distrust wording is checked.
+    // The plain "found no known scam patterns" reason is allowed; only distrust wording is checked.
     expect(text).not.toMatch(/don't|do not|suspicious|careful|beware|fake/);
   });
 
