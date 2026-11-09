@@ -56,7 +56,10 @@ async function senderInfo(deps: Deps, config: CompanyConfig, sender_hash: string
   const report_count = countDistinctCustomers(reports);
   if (isOfficialSender(config, sender_hash)) return { report_count, warning: null, status: "official" };
   const outbreak = await deps.storage.findOutbreak(config.company_id, sender_hash);
-  if (outbreak) return { report_count, warning: OUTBREAK_WARNING, status: `outbreak_${outbreak.status}` };
+  if (outbreak) {
+    // Golden rule 6: a customer-facing warning needs human approval. A suspected outbreak gives no warning.
+    return { report_count, warning: outbreak.status === "approved" ? OUTBREAK_WARNING : null, status: `outbreak_${outbreak.status}` };
+  }
   return { report_count, warning: null, status: "none" };
 }
 

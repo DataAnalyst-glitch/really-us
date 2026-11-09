@@ -31,18 +31,43 @@ describe("T10 three distinct customers, same sender", () => {
     expect(JSON.stringify(stored)).not.toContain("555 0199");
   });
 
-  it("sender lookup and verify show the count and a warning", async () => {
+  it("sender lookup and verify show the count, but no warning while the outbreak is only suspected", async () => {
     const { deps } = setup();
     for (const c of ["CUST-1", "CUST-2", "CUST-3"]) await report(deps, { customer_ref: c });
     const hash = hashSender(SCAM_SENDER);
     const lookup = await handleSenderLookup(deps, { company_id: "northline", sender_hash: hash });
     expect(lookup.body.report_count).toBe(3);
     expect(lookup.body.status).toBe("outbreak_suspected");
-    expect(lookup.body.warning).toBeTruthy();
+    expect(lookup.body.warning).toBeNull();
     const v = await verify(deps, { message: "Hello there.", sender: SCAM_SENDER });
     expect(v.body.sender_hash).toBe(hash);
     expect(v.body.report_count).toBe(3);
-    expect(v.body.warning).toBeTruthy();
+    expect(v.body.warning).toBeNull();
+    expect(JSON.stringify(v.body)).not.toMatch(/Several customers have reported/);
+  });
+
+  it("after a person approves the outbreak, verify and sender lookup return the warning", async () => {
+    const { deps } = setup();
+    for (const c of ["CUST-1", "CUST-2", "CUST-3"]) await report(deps, { customer_ref: c });
+    const hash = hashSender(SCAM_SENDER);
+    const outbreakId = `OB-northline-${hash.slice(0, 10)}`;
+    const approve = await handleApproveOutbreak(deps, { demo_key: DEMO_KEY, outbreak_id: outbreakId, confirmed: true, idempotency_key: "approve-w" });
+    expect(approve.body.success).toBe(true);
+
+    const lookup = await handleSenderLookup(deps, { company_id: "northline", sender_hash: hash });
+    expect(lookup.body.status).toBe("outbreak_approved");
+    expect(lookup.body.warning).toBe("Several customers have reported this sender. Treat it with care.");
+    const v = await verify(deps, { message: "Hello there.", sender: SCAM_SENDER });
+    expect(v.body.warning).toBe("Several customers have reported this sender. Treat it with care.");
+    // the verdict itself is not affected by the warning
+    expect(v.body.verdict).toBe("NO_MATCHING_NOTICE");
+  });
+
+  it("a sender with no outbreak, and an official sender, never get a warning", async () => {
+    const { deps } = setup();
+    await report(deps, { customer_ref: "CUST-1" });
+    expect((await verify(deps, { message: "Hello there.", sender: SCAM_SENDER })).body.warning).toBeNull();
+    expect((await verify(deps, { message: "Hello there.", sender: "NLPOWER" })).body.warning).toBeNull();
   });
 });
 
