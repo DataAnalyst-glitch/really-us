@@ -34,7 +34,10 @@ export function detectScamSigns(config: CompanyConfig, message: string): Detecte
 
 // ---- Deciding the verdict (pure) ---------------------------------------------
 
-const NO_SCAM_FACT = "No scam warning signs were found in the message text.";
+// Not-found is not proof. On the no-notice paths the reason says so. A genuine result is confirmed by the
+// notice or Proof Code, so there the plain fact is enough. The word "safe" is never used (golden rule 3).
+const NO_SCAM_FACT = "We found no known scam patterns in the text. That does not mean the message is genuine.";
+const NO_SCAM_FACT_GENUINE = "We found no known scam patterns in the text.";
 const NO_NOTICE_FACT = "No matching notice was found for this check.";
 const NO_CODE_FACT = "No valid Proof Code was given.";
 const BAD_CODE_FACT = "The Proof Code does not match a real notice.";
@@ -98,7 +101,7 @@ export function decideVerdict(config: CompanyConfig, facts: VerdictFacts): Verdi
   const accountConfirmed = accountNotice && senderOfficial;
   if (proof === "valid" || accountConfirmed) {
     const reasons = [
-      NO_SCAM_FACT,
+      NO_SCAM_FACT_GENUINE,
       ...(proof === "valid" ? [GOOD_CODE_FACT] : []),
       ...(accountConfirmed ? [ACCOUNT_NOTICE_FACT, OFFICIAL_SENDER_FACT] : []),
       ONE_NOTICE_ONLY_FACT,

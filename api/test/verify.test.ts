@@ -30,7 +30,7 @@ describe("T1 scam text, no notice", () => {
     const { deps } = setup();
     const res = await verify(deps, { message: cleanNorthline });
     expect(res.body.verdict).toBe("NO_MATCHING_NOTICE");
-    expect((res.body.reasons as string[])[0]).toMatch(/No scam warning signs/);
+    expect((res.body.reasons as string[])[0]).toMatch(/no known scam patterns/i);
   });
 });
 
