@@ -10,3 +10,4 @@
 - 2026-11-10: `customer_text` on `/v1/verify` now includes the approved-outbreak warning ("Heads-up: ...") after the opening line. Suspected outbreaks still give no warning text. Unchanged when `warning` is null.
 - 2026-11-10: Reworded the "no scam signs" reason so it does not sound like reassurance (cautious wording on no-notice results, plain wording on genuine results). Rules and verdict logic unchanged.
 - 2026-11-10: Recorded the eGain build and the live checks (owner-verified): README, JUDGES, SUBMISSION, HACKATHON_RULES, TEST_PLAN, egain/ specs, Demo Link and production URLs, known limits. Demo home page text now describes how the chat is reached. Unchecked items stay unchecked.
+- 2026-11-10: Release prep: MIT LICENSE, license section in README, `.gitignore` now covers key files, secrets scan of the tree and all history recorded (none found), four Content and conduct boxes and one SUBMISSION box ticked with evidence.

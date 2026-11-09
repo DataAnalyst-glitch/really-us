@@ -13,7 +13,7 @@ Scammers send messages threatening to cut off a customer's power tonight, and cu
 
 ## Checklist
 - [ ] Agent trained, tested, published
-- [ ] Content authorized, no sensitive data
+- [x] Content authorized, no sensitive data (fictional content only; secrets scan of the tree and full history on 2026-11-10 found none; see docs/DECISIONS.md)
 - [x] Pre-chat, escalation, process work; process on an intent (owner-verified 2026-11-10; see egain/)
 - [ ] Demo link works in a clean browser
 - [ ] Description and 1-minute video complete

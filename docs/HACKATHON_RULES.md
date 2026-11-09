@@ -21,10 +21,10 @@ Source: eGain AI Agent Hackathon page and Devpost listing, read 9 Nov 2026. Re-c
 - [ ] Ready for temporary reviewer access or a short live demo
 
 ## Content and conduct
-- [ ] Only content and assets owned, authorized, or supplied for the hackathon
-- [ ] No confidential information, personal data, passwords, account numbers or real customer records
-- [ ] Fictional test data and demonstration contact details
-- [ ] Material pre-existing templates, code and third-party assets disclosed
+- [x] Only content and assets owned, authorized, or supplied for the hackathon. Evidence: `knowledge/` holds 6 articles written for this project and each is marked fictional; no other content or assets are used; code dependencies are listed in `docs/DECISIONS.md`
+- [x] No confidential information, personal data, passwords, account numbers or real customer records. Evidence: all data is fictional (`api/src/fixtures.ts`, `api/src/companies/`); the harness scans for key patterns on every run; Secrets scan 2026-11-10: working tree and all 25 commits on every ref (history and commit messages) checked for key and token prefixes, private key blocks, JWTs, env files and long key-like strings. No secrets found; only test placeholders and a public Demo Link path. See docs/DECISIONS.md.
+- [x] Fictional test data and demonstration contact details. Evidence: 555-range numbers and `.example` domains in `api/src/companies/`, fixtures in `api/src/fixtures.ts`, labels on `console/index.html`; fictional names recorded in `docs/DECISIONS.md`
+- [x] Material pre-existing templates, code and third-party assets disclosed. Evidence: section "Pre-existing templates, code, third-party assets" in `docs/DECISIONS.md` (typescript, vitest, @types/node, @netlify/blobs); AI-tool use disclosed in `README.md`; MIT `LICENSE` added
 - [ ] Able to explain and demonstrate the solution
 - [ ] eGain platform terms and community guidelines followed
 - [ ] No plagiarism, harmful content, misrepresentation, interference or vote manipulation
