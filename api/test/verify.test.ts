@@ -68,7 +68,7 @@ describe("T3 valid Proof Code", () => {
     expect(text).not.toContain(REAL_ACCOUNT);
     expect(text).not.toContain("N-NP-1");
     expect(Object.keys(res.body).sort()).toEqual(
-      ["demo_data", "next_step", "reasons", "report_count", "sender_hash", "success", "verdict", "warning"].sort(),
+      ["customer_text", "demo_data", "next_step", "reasons", "report_count", "sender_hash", "success", "verdict", "warning"].sort(),
     );
   });
 
