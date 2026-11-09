@@ -61,6 +61,17 @@ describe("console/trust.html (Trust Console)", () => {
     expect((js.match(/idempotency_key:/g) ?? []).length).toBe(4);
   });
 
+  it("has the tinted boxes and a readable Reset Demo in every state, and keeps status words", () => {
+    for (const cls of [".count.reports", ".count.cases", ".count.outbreaks", ".count.alerts", ".box.alert", ".box.draft", ".feed"]) {
+      expect(trust).toContain(cls);
+    }
+    for (const rule of ["button.warn:hover", "button.warn.armed:hover", "button:disabled"]) expect(trust).toContain(rule);
+    // no teal hover rule may reach the red Reset button (it caused dark text on a dark background)
+    expect(trust).toContain("button:not(.plain):not(.warn):hover");
+    expect(trust).toMatch(/Suspected/);
+    expect(trust).toMatch(/Approved/);
+  });
+
   it("the script parses", () => {
     expect(() => new Function(js)).not.toThrow();
   });
