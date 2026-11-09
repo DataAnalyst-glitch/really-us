@@ -8,7 +8,7 @@ const cases = [
   { verdict: "NO_MATCHING_NOTICE", opening: "Don't act on it yet.", body: { message: cleanNorthline } },
   {
     verdict: "GENUINE_NOTICE_FOUND",
-    opening: "Good news: this matches a real notice.",
+    opening: "This matches a notice we have on file.",
     body: { message: cleanNorthline, demo_account: "DEMO-NP-1001", sender: "NLPOWER" },
   },
 ] as const;

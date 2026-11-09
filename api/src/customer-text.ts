@@ -7,7 +7,7 @@ export const CUSTOMER_TEXT_MAX = 900;
 export const OPENING: Record<Verdict, string> = {
   MATCHES_SCAM_SIGNS: "Don't call or pay yet.",
   NO_MATCHING_NOTICE: "Don't act on it yet.",
-  GENUINE_NOTICE_FOUND: "Good news: this matches a real notice.",
+  GENUINE_NOTICE_FOUND: "This matches a notice we have on file.",
 };
 
 const LABEL: Record<Verdict, string> = {
