@@ -3,6 +3,7 @@ import { countDistinctCustomers, shouldSuspectOutbreak } from "./outbreak.js";
 import { checkProofCode, normalizeProofCode } from "./proofcode.js";
 import { hashSender, isOfficialSender, maskSender } from "./sender.js";
 import { buildCustomerText } from "./customer-text.js";
+import { buildAlertText } from "./outbreak-content.js";
 import { decideVerdict, detectScamSigns } from "./verdict.js";
 import type { ApiResult, CasePriority, CompanyConfig, Outbreak, Report, Storage } from "./types.js";
 
@@ -21,15 +22,15 @@ const SUPPORT_STEP = "Please contact support through an official channel.";
 
 // ---- small helpers -------------------------------------------------------------
 
-function respond(status: number, success: boolean, fields: Record<string, unknown> = {}): ApiResult {
+export function respond(status: number, success: boolean, fields: Record<string, unknown> = {}): ApiResult {
   return { status, body: { success, demo_data: true, ...fields } };
 }
-const fail = (status: number, error: string, extra: Record<string, unknown> = {}) => respond(status, false, { error, ...extra });
+export const fail = (status: number, error: string, extra: Record<string, unknown> = {}) => respond(status, false, { error, ...extra });
 
-const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
+export const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 const asText = (v: unknown): string | undefined => (typeof v === "string" ? v : undefined);
-const nonEmpty = (v: unknown): v is string => typeof v === "string" && v.trim() !== "";
-const nowOf = (deps: Deps) => (deps.now ? deps.now() : new Date().toISOString());
+export const nonEmpty = (v: unknown): v is string => typeof v === "string" && v.trim() !== "";
+export const nowOf = (deps: Deps) => (deps.now ? deps.now() : new Date().toISOString());
 
 type Resolved =
   | { kind: "ok"; config: CompanyConfig }
@@ -46,7 +47,7 @@ function resolveCompany(deps: Deps, company_id: unknown): Resolved {
   return { kind: "unknown" };
 }
 
-async function audit(deps: Deps, type: string, company_id: string | null, detail: Record<string, unknown>) {
+export async function audit(deps: Deps, type: string, company_id: string | null, detail: Record<string, unknown>) {
   await deps.storage.addAudit({ event_id: deps.storage.nextId("EV"), type, company_id, detail, created_at: nowOf(deps) });
 }
 
@@ -62,7 +63,7 @@ async function senderInfo(deps: Deps, config: CompanyConfig, sender_hash: string
 // Every write goes through here: confirmed=true and an idempotency_key are enforced in the API.
 // Same key + same payload returns the stored result. Same key + different payload is rejected.
 // Failed writes are not stored (an unknown outcome must not be resubmitted blindly).
-async function runWrite(
+export async function runWrite(
   deps: Deps,
   args: {
     action: string;
@@ -301,12 +302,15 @@ export async function handleApproveOutbreak(
       const outbreak = await deps.storage.getOutbreak(String(input.outbreak_id));
       if (!outbreak) return fail(404, "OUTBREAK_NOT_FOUND");
       if (outbreak.status !== "approved") {
+        const config = getCompany(outbreak.company_id);
+        const customers = countDistinctCustomers(await deps.storage.listReports(outbreak.company_id, outbreak.sender_hash));
         await deps.storage.saveOutbreak({ ...outbreak, status: "approved" });
         await deps.storage.addAlert({
           alert_id: deps.storage.nextId("ALERT"),
           outbreak_id: outbreak.outbreak_id,
           company_id: outbreak.company_id,
           simulated: true,
+          alert_text: config ? buildAlertText(config, outbreak, customers) : "",
           created_at: nowOf(deps),
         });
         await audit(deps, "outbreak_approved", outbreak.company_id, { outbreak_id: outbreak.outbreak_id });

@@ -1,16 +1,17 @@
 import { fixtureNotices } from "./fixtures.js";
 import type {
-  Alert, AuditEvent, CaseRecord, IdempotencyRecord, Notice, Outbreak, Report, Storage,
+  Alert, AuditEvent, CaseRecord, IdempotencyRecord, KnowledgeDraft, Notice, Outbreak, Report, Storage,
 } from "./types.js";
 
 // In-memory storage. Each call to createMemoryStorage gives a fresh, empty state.
 export function createMemoryStorage(notices: Notice[] = fixtureNotices): Storage {
   const idempotency = new Map<string, IdempotencyRecord>();
-  const reports: Report[] = [];
-  const cases: CaseRecord[] = [];
+  let reports: Report[] = [];
+  let cases: CaseRecord[] = [];
   const outbreaks = new Map<string, Outbreak>();
-  const alerts: Alert[] = [];
-  const audit: AuditEvent[] = [];
+  let alerts: Alert[] = [];
+  let audit: AuditEvent[] = [];
+  const drafts = new Map<string, KnowledgeDraft>();
   const counters = new Map<string, number>();
 
   return {
@@ -72,6 +73,27 @@ export function createMemoryStorage(notices: Notice[] = fixtureNotices): Storage
     },
     async listAudit() {
       return [...audit];
+    },
+
+    async saveDraft(draft) {
+      drafts.set(draft.draft_id, draft);
+    },
+    async getDraft(draft_id) {
+      return drafts.get(draft_id);
+    },
+    async listDrafts() {
+      return [...drafts.values()];
+    },
+
+    async reset() {
+      idempotency.clear();
+      reports = [];
+      cases = [];
+      outbreaks.clear();
+      alerts = [];
+      audit = [];
+      drafts.clear();
+      counters.clear();
     },
 
     nextId(prefix) {
