@@ -9,7 +9,8 @@ lets them ask the only party that knows: the company named in the message.
 ## For judges: 60-second tour
 | Want to | Go to |
 |---|---|
-| Try the agent | Demo link: `TO_ADD_AFTER_PUBLISH` |
+| Try the agent | [Demo Link](https://ai.egain.cloud/d3y6/system/web/apps/aiagent/demo.html?agentId=714122e0-9c7e-4143-8554-12afacbf3728&backgroundUrl=https://cdn.aiagent.egain.cloud/TMPRODB52840291/screenshots/7ac7046c-bc4b-4b04-b0af-a67ce25d3f2c.png) (opens without a code) |
+| See the live demo site | [https://really-us-verifier.netlify.app](https://really-us-verifier.netlify.app) |
 | See the 1-minute video | `TO_ADD_AFTER_RECORDING` |
 | Check every rule against evidence | [docs/JUDGES.md](docs/JUDGES.md) |
 | See test results | [docs/TEST_PLAN.md](docs/TEST_PLAN.md) |
@@ -32,11 +33,26 @@ lets them ask the only party that knows: the company named in the message.
 ## Status (honest)
 | Part | State |
 |---|---|
-| Demo API (verify, Proof Code, reports, cases, outbreaks, approval) | Built, tested with unit tests |
-| Netlify Functions HTTP layer | Built, tested by calling each function handler; an earlier version was smoke-tested on the live site |
-| Netlify Blobs storage | Built, tested against a fake store only; not yet run on Netlify |
-| Trust Console (`console/trust.html`) and demo home page (`console/index.html`) | Built; Trust Console checked in a browser on a local server; not deployed |
-| eGain agent and workflows | Built by a person in eGain; not verifiable from this repo. `egain/` holds the build specs |
+| Demo API (verify, Proof Code, reports, cases, outbreaks, approval) | Built; unit tests; running in production |
+| Netlify Functions HTTP layer | Built and running at https://really-us-verifier.netlify.app |
+| Storage (Netlify Blobs) | Running in production; reports, cases and outbreaks persisted (owner-verified 2026-11-10) |
+| Trust Console (`console/trust.html`) and demo home page (`console/index.html`) | Running in production; outbreak approval and draft approval done in it |
+| eGain agent and workflows | Published and run in chat (owner-verified 2026-11-10). Facts are recorded in `egain/` and `docs/TEST_PLAN.md`; they cannot be re-checked from this repo |
+| Full test run (T1-T23) on eGain | Not done. Only the chats listed in `docs/TEST_PLAN.md` under "Run on 2026-11-10" were run |
+| Video, final description, submission channel, participant info, license | Not done |
+
+## Live URLs
+- Demo Link (eGain agent): https://ai.egain.cloud/d3y6/system/web/apps/aiagent/demo.html?agentId=714122e0-9c7e-4143-8554-12afacbf3728&backgroundUrl=https://cdn.aiagent.egain.cloud/TMPRODB52840291/screenshots/7ac7046c-bc4b-4b04-b0af-a67ce25d3f2c.png
+- Demo site and API: https://really-us-verifier.netlify.app (Trust Console at `/trust.html`, needs the demo key)
+
+## Known limits
+- The scam rules are deliberately narrow. A message such as "pay now or your power is cut", with no time word, no link and no phone number, is not flagged. The reply says "no matching notice" and "do not act on it yet", and that finding no known patterns does not mean the message is genuine.
+- The customer reference used for outbreak counting is the chat session id. One person opening three chats could trigger an outbreak.
+- Alerts are simulated. Nobody is contacted.
+- There is no knowledge upload. Approving a draft only records the approval; nothing goes to eGain knowledge.
+- Two requests with the same new idempotency key at the same instant are not atomic on Blobs. A retry after the first finishes is safe.
+- The eGain Test panel hides some mapped values, so some checks were made in the chat itself.
+- The full T1-T23 run on eGain is not done yet.
 
 ## Endpoints
 `POST /v1/verify`, `GET /v1/senders/{hash}`, `POST /v1/reports` and `POST /v1/cases` (`X-API-Key`), and the Trust Console endpoints (`X-Demo-Key`): `GET /v1/console/state`, `POST /v1/outbreaks/{id}/approve`, `POST /v1/outbreaks/{id}/draft`, `POST /v1/drafts/{id}/approve`, `POST /v1/demo/reset`. Details: [docs/TECHNOLOGY.md](docs/TECHNOLOGY.md).
