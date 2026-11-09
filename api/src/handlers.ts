@@ -153,7 +153,7 @@ export async function handleVerify(deps: Deps, body: unknown): Promise<ApiResult
     verdict: decision.verdict,
     reasons: decision.reasons,
     next_step: decision.next_step,
-    customer_text: buildCustomerText(decision.verdict, decision.reasons, decision.next_step),
+    customer_text: buildCustomerText(decision.verdict, decision.reasons, decision.next_step, warning),
     sender_hash,
     report_count,
     warning,
