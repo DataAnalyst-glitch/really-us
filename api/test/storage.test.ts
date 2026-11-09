@@ -1,30 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { createBlobsStorage, type BlobStoreLike } from "../src/blobs-storage.js";
+import { createBlobsStorage } from "../src/blobs-storage.js";
 import { handleApproveOutbreak, handleCase, handleReport, handleVerify, type Deps } from "../src/handlers.js";
 import { hashSender } from "../src/sender.js";
 import { createMemoryStorage } from "../src/storage.js";
 import type { Storage } from "../src/types.js";
-
-// A fake Blobs store. A second adapter over the same fake store models a new serverless invocation.
-export function fakeBlobStore(): BlobStoreLike {
-  const data = new Map<string, string>();
-  return {
-    async get(key) {
-      const v = data.get(key);
-      return v === undefined ? null : JSON.parse(v);
-    },
-    async setJSON(key, value) {
-      data.set(key, JSON.stringify(value));
-    },
-    async delete(key) {
-      data.delete(key);
-    },
-    async list(options) {
-      const prefix = options?.prefix ?? "";
-      return { blobs: [...data.keys()].filter((k) => k.startsWith(prefix)).sort().map((key) => ({ key })) };
-    },
-  };
-}
+import { fakeBlobStore } from "./fake-blobs.js";
 
 const NOW = "2026-11-09T00:00:00.000Z";
 const SENDER = "+1 555 0199";
