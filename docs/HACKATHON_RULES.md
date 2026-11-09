@@ -15,7 +15,7 @@ Source: eGain AI Agent Hackathon page and Devpost listing, read 9 Nov 2026. Re-c
 - [ ] Participant or team information
 - [x] Agent name, industry, use case (docs/SUBMISSION.md; the agent in eGain is named "Really Us Message Verifier")
 - [x] Working demo link (README.md and docs/SUBMISSION.md; opens without a code, owner-verified 2026-11-10)
-- [x] Description up to 150 words: problem, intended user, business value, distinctive features. Evidence: `docs/SUBMISSION.md`, 135 words (harness-checked). It names the problem, the intended user (utility customers) and the distinctive features; business value is not stated in its own sentence
+- [x] Description up to 150 words: problem, intended user, business value, distinctive features. Evidence: `docs/SUBMISSION.md`, 144 words (harness-checked). It states the problem, the intended user (utility customers), the business value (a clear answer for customers and earlier warning of scam waves for support teams) and the distinctive features
 - [ ] One-minute video: content-based answer, at least one workflow, most valuable or distinctive feature
 - [ ] Confirmation that all required workflows were published and tested
 - [ ] Ready for temporary reviewer access or a short live demo
