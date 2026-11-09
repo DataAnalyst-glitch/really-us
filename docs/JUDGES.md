@@ -5,12 +5,12 @@ Status values: PLANNED, BUILT, VERIFIED. Update with evidence links as work comp
 | Hackathon requirement | Implementation | Status | Evidence |
 |---|---|---|---|
 | Knowledge-based AI Agent | `knowledge/`, eGain sources | BUILT | 6 fictional articles trained; 4 grounded answers in `docs/TEST_PLAN.md`. Generated-intent review not recorded |
-| Published experience, demo link | eGain publish | VERIFIED | Demo Link in `README.md`; opens without a code; chat answered on desktop and phone (owner, 2026-11-10) |
+| Published experience, demo link | eGain publish | VERIFIED | Demo Link in `README.md`; opens without a code (the eGain settings box shows an empty URL after creation, but the link works); chat answered on desktop and phone (owner, 2026-11-10) |
 | Pre-chat workflow | `egain/pre-chat.md` | VERIFIED | "Really Us Pre-chat" published and run (owner, 2026-11-10) |
 | Escalation, 2+ options | `egain/escalation.md` | VERIFIED | Call and Email the fraud desk; Direct, Knowledge Gap and Thumbs Down fired (owner, 2026-11-10) |
 | Process workflow on an intent | `egain/workflows.md` | VERIFIED | Four Process workflows mapped to intents and run in chat (owner, 2026-11-10) |
 | Actions | Reports and cases via API | BUILT | `api/test/writes.test.ts`, `api/test/http.test.ts`. Report and case flows ran in chat and returned a report reference and a case number (owner, 2026-11-10). "Actions enabled and added to the AI Agent" is not recorded |
-| Validation in Test AI Agent and demo link | `docs/TEST_PLAN.md` | BUILT | "Run on 2026-11-10" lists the chats run. The full T1-T23 run is NOT done |
+| Validation in Test AI Agent and demo link | `docs/TEST_PLAN.md` | BUILT | "Run on 2026-11-10" lists the chats run: Part A (7 cases) and R-T1 to R-T16, with FAILs that are one finding (the demo failure triggers cannot be reached from chat). The full T1-T23 run is NOT done |
 | Fictional data, authorized content | `knowledge/`, API fixtures | BUILT | `api/src/fixtures.ts`, `api/src/companies/`, `console/index.html` |
 | Outbreak, Trust Console, Scam Vaccine, Knowledge Loop (beyond the checklist) | `api/src/console.ts`, `console/trust.html` | BUILT | `api/test/console.test.ts`, `api/test/http-console.test.ts`, `api/test/console-pages.test.ts`. Outbreak end to end verified in production (owner, 2026-11-10): 3 chat sessions, Suspected, person approval, warning shown to the next customer, draft created and approved |
 | 150 words and 1-minute video | `docs/SUBMISSION.md` | PLANNED | |
@@ -39,10 +39,12 @@ Allow up to 5 minutes after publishing for changes to appear.
 4. Reset Demo clears everything.
 
 ## Known limits
-- The scam rules are deliberately narrow. "Pay now or your power is cut", with no time word, link or phone number, is not flagged. The reply says "no matching notice" and "do not act on it yet".
-- The customer reference for outbreak counting is the chat session id, so one person opening three chats could trigger an outbreak.
-- Alerts are simulated. Nobody is contacted.
-- No knowledge upload: approving a draft only records the approval. No API was found to create eGain knowledge articles.
-- Two requests with the same new idempotency key at the same instant are not atomic.
-- The eGain Test panel hides some mapped values.
-- Not done yet: the video, the final description edit, the full T1-T23 run, the submission channel, participant information, license and repo visibility.
+- Paste the real message as the FIRST message in the chat. If a customer first types something else, that sentence is checked as the message.
+- Proof Code verification confirms the code (one notice). It does not compare the notice text.
+- The scam rules are deliberately narrow and deterministic. A phrase like "pay now or your power is cut", with no time word, link or phone number, is not flagged. The reply then says "no matching notice" and "do not act yet".
+- The customer reference used for outbreak counting is the chat session id, so one person opening three chats could trigger an outbreak.
+- Alerts are simulated. Nobody is contacted. Approving a knowledge draft records the human approval only; nothing is uploaded to eGain knowledge.
+- The demo failure paths (`TESTFAIL`, `TESTFAILWRITE`) trigger by `company_id` only, so they are verified by unit tests and direct API calls, not from the chat. The Report Message success condition (`status === 200 && body.success === true`) is published in v2 and was tested with a normal report reference.
+- Two requests with the same new idempotency key at the same instant are not atomic. The eGain Test panel hides some mapped values.
+- The full T1-T23 run on eGain is not done yet.
+- Not done yet: the video, the final description edit, the submission channel, participant information and the terms review.
