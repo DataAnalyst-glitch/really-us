@@ -2,6 +2,7 @@ import { getCompany } from "./companies/index.js";
 import { countDistinctCustomers, shouldSuspectOutbreak } from "./outbreak.js";
 import { checkProofCode, normalizeProofCode } from "./proofcode.js";
 import { hashSender, isOfficialSender, maskSender } from "./sender.js";
+import { buildCustomerText } from "./customer-text.js";
 import { decideVerdict, detectScamSigns } from "./verdict.js";
 import type { ApiResult, CasePriority, CompanyConfig, Outbreak, Report, Storage } from "./types.js";
 
@@ -148,6 +149,7 @@ export async function handleVerify(deps: Deps, body: unknown): Promise<ApiResult
     verdict: decision.verdict,
     reasons: decision.reasons,
     next_step: decision.next_step,
+    customer_text: buildCustomerText(decision.verdict, decision.reasons, decision.next_step),
     sender_hash,
     report_count,
     warning,
