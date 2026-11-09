@@ -1,7 +1,9 @@
 import { createHash, timingSafeEqual } from "node:crypto";
+import { createBlobsStorage, type BlobStoreLike } from "./blobs-storage.js";
+import { demoKeyOk, handleApproveDraft, handleConsoleState, handleCreateDraft, handleReset } from "./console.js";
 import { handleApproveOutbreak, handleCase, handleReport, handleSenderLookup, handleVerify, type Deps } from "./handlers.js";
 import { createMemoryStorage } from "./storage.js";
-import type { ApiResult } from "./types.js";
+import type { ApiResult, Storage } from "./types.js";
 
 // Thin HTTP adapter. It parses the request, checks the method and key, calls an existing
 // handler and returns the handler's status and JSON body. It contains no verdict logic.
@@ -15,7 +17,7 @@ export interface RequestInfo {
 
 export interface Route {
   method: "GET" | "POST";
-  auth?: "api_key" | "demo_key"; // api_key: X-API-Key must equal API_KEY. demo_key: the handler checks X-Demo-Key.
+  auth?: "api_key" | "demo_key"; // api_key: X-API-Key must equal API_KEY. demo_key: X-Demo-Key must equal DEMO_KEY.
   run: (deps: Deps, info: RequestInfo) => Promise<ApiResult>;
 }
 
@@ -26,10 +28,37 @@ export interface FunctionContext {
 
 type Env = Record<string, string | undefined>;
 
-// Memory storage does not persist between serverless invocations. See docs/DECISIONS.md.
-let storage = createMemoryStorage();
+// On Netlify the demo data lives in Netlify Blobs, because memory does not persist between serverless
+// invocations. Locally and in tests it is memory. STORAGE_BACKEND=blobs|memory forces a choice.
+// If Blobs fails there is no silent fallback to memory: the request returns SERVER_ERROR.
+let storagePromise: Promise<Storage> | undefined;
+
+function useBlobs(env: Env): boolean {
+  if (env.STORAGE_BACKEND === "blobs") return true;
+  if (env.STORAGE_BACKEND === "memory") return false;
+  return Boolean(env.NETLIFY_BLOBS_CONTEXT);
+}
+
+function getStorage(env: Env): Promise<Storage> {
+  storagePromise ??= (async () => {
+    if (!useBlobs(env)) return createMemoryStorage();
+    const { getStore } = await import("@netlify/blobs");
+    return createBlobsStorage(getStore({ name: "really-us-demo", consistency: "strong" }) as unknown as BlobStoreLike);
+  })().catch((err) => {
+    storagePromise = undefined;
+    throw err;
+  });
+  return storagePromise;
+}
+
 export function resetStorageForTests(): void {
-  storage = createMemoryStorage();
+  storagePromise = Promise.resolve(createMemoryStorage());
+}
+export function forgetStorageForTests(): void {
+  storagePromise = undefined;
+}
+export function useStorageForTests(storage: Storage): void {
+  storagePromise = Promise.resolve(storage);
 }
 
 function json(status: number, body: Record<string, unknown>, extra: Record<string, string> = {}): Response {
@@ -57,6 +86,10 @@ export async function serve(req: Request, params: Record<string, string>, route:
       return fail(401, "API_KEY_REQUIRED");
     }
 
+    if (route.auth === "demo_key" && !demoKeyOk({ env: { DEMO_KEY: env.DEMO_KEY } }, req.headers.get("x-demo-key"))) {
+      return fail(401, "DEMO_KEY_REQUIRED");
+    }
+
     let body: unknown = undefined;
     if (route.method === "POST") {
       try {
@@ -66,7 +99,7 @@ export async function serve(req: Request, params: Record<string, string>, route:
       }
     }
 
-    const deps: Deps = { storage, env: { DEMO_DATA_ONLY: env.DEMO_DATA_ONLY, DEMO_KEY: env.DEMO_KEY } };
+    const deps: Deps = { storage: await getStorage(env), env: { DEMO_DATA_ONLY: env.DEMO_DATA_ONLY, DEMO_KEY: env.DEMO_KEY } };
     const result = await route.run(deps, {
       body,
       query: new URL(req.url).searchParams,
@@ -106,4 +139,40 @@ export const approveRoute: Route = {
       idempotency_key: b.idempotency_key,
     });
   },
+};
+
+// ---- Trust Console routes (all need X-Demo-Key) ----------------------------------------
+
+const bodyOf = (i: RequestInfo): Record<string, unknown> =>
+  typeof i.body === "object" && i.body !== null && !Array.isArray(i.body) ? (i.body as Record<string, unknown>) : {};
+const demoKeyOf = (i: RequestInfo) => i.headers.get("x-demo-key") ?? undefined;
+
+export const consoleStateRoute: Route = {
+  method: "GET",
+  auth: "demo_key",
+  run: (deps, i) => handleConsoleState(deps, { demo_key: demoKeyOf(i) }),
+};
+
+export const resetRoute: Route = {
+  method: "POST",
+  auth: "demo_key",
+  run: (deps, i) => handleReset(deps, { demo_key: demoKeyOf(i), confirmed: bodyOf(i).confirmed, idempotency_key: bodyOf(i).idempotency_key }),
+};
+
+export const draftRoute: Route = {
+  method: "POST",
+  auth: "demo_key",
+  run: (deps, i) =>
+    handleCreateDraft(deps, {
+      demo_key: demoKeyOf(i), outbreak_id: i.params.id, confirmed: bodyOf(i).confirmed, idempotency_key: bodyOf(i).idempotency_key,
+    }),
+};
+
+export const draftApproveRoute: Route = {
+  method: "POST",
+  auth: "demo_key",
+  run: (deps, i) =>
+    handleApproveDraft(deps, {
+      demo_key: demoKeyOf(i), draft_id: i.params.id, confirmed: bodyOf(i).confirmed, idempotency_key: bodyOf(i).idempotency_key,
+    }),
 };

@@ -87,7 +87,22 @@ export interface Alert {
   outbreak_id: string;
   company_id: string;
   simulated: true;
+  alert_text: string; // plain text a person approved; the send is simulated
   created_at: string;
+}
+
+// Knowledge Loop: a draft article for a human to approve and upload by hand. Never auto-published.
+export type DraftStatus = "draft" | "approved";
+
+export interface KnowledgeDraft {
+  draft_id: string;
+  outbreak_id: string;
+  company_id: string;
+  status: DraftStatus;
+  title: string;
+  article_markdown: string;
+  created_at: string;
+  approved_at?: string;
 }
 
 export interface AuditEvent {
@@ -136,5 +151,13 @@ export interface Storage {
   addAudit(event: AuditEvent): Promise<void>;
   listAudit(): Promise<AuditEvent[]>;
 
+  saveDraft(draft: KnowledgeDraft): Promise<void>;
+  getDraft(draft_id: string): Promise<KnowledgeDraft | undefined>;
+  listDrafts(): Promise<KnowledgeDraft[]>;
+
+  // Demo reset: back to the fixture state (fixtures are code, not stored data).
+  reset(): Promise<void>;
+
+  // Lists return oldest first.
   nextId(prefix: string): string;
 }
