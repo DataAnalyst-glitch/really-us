@@ -10,14 +10,14 @@ Mark each platform fact ASSUMPTION or VERIFIED.
 | Pre-chat, Process, Escalation workflows | VERIFIED (2026-11-10, owner, published and run in chat) | pre-chat.md, workflows.md, escalation.md |
 | API node | VERIFIED (2026-11-10, owner, live chats) | Process workflows call the live API: see workflows.md |
 | Enable Actions, Custom Actions | VERIFIED (2026-11-09, trial UI) | Create Custom API visible |
-| Publish, demo link | VERIFIED (2026-11-10, owner) | Demo Link created from Personalize and Publish; opens without a code; link in the root README.md |
+| Publish, demo link | VERIFIED (2026-11-10, owner) | Demo Link created from Personalize and Publish; opens without a code; link in the root README.md. The settings box shows an empty URL after creation, but the link works |
 | Certified Answers | VERIFIED setting present (2026-11-09); use ASSUMPTION | Toggle in Conversation Behavior |
 | Connectors | ASSUMPTION | |
 
 ## Built and verified on 2026-11-10 (owner, live)
 | Item | Name in eGain | Spec |
 |---|---|---|
-| AI Agent | Really Us Message Verifier | this file |
+| AI Agent | Really Us Message Verifier | [agent-settings.md](agent-settings.md) |
 | Pre-chat workflow | Really Us Pre-chat | [pre-chat.md](pre-chat.md) |
 | Process workflows | Verify Message (v3), Verify With Proof Code, Report Message, Open Case | [workflows.md](workflows.md) |
 | Escalation workflow | Really Us Escalation | [escalation.md](escalation.md) |

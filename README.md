@@ -42,16 +42,19 @@ lets them ask the only party that knows: the company named in the message.
 | Video, final description, submission channel, participant info, license | Not done |
 
 ## Live URLs
+Note: After creation the eGain settings box shows an empty URL field, but the Demo Link itself works, so the link is kept in this repository.
+
 - Demo Link (eGain agent): https://ai.egain.cloud/d3y6/system/web/apps/aiagent/demo.html?agentId=714122e0-9c7e-4143-8554-12afacbf3728&backgroundUrl=https://cdn.aiagent.egain.cloud/TMPRODB52840291/screenshots/7ac7046c-bc4b-4b04-b0af-a67ce25d3f2c.png
 - Demo site and API: https://really-us-verifier.netlify.app (Trust Console at `/trust.html`, needs the demo key)
 
 ## Known limits
-- The scam rules are deliberately narrow. A message such as "pay now or your power is cut", with no time word, no link and no phone number, is not flagged. The reply says "no matching notice" and "do not act on it yet", and that finding no known patterns does not mean the message is genuine.
-- The customer reference used for outbreak counting is the chat session id. One person opening three chats could trigger an outbreak.
-- Alerts are simulated. Nobody is contacted.
-- There is no knowledge upload. Approving a draft only records the approval; nothing goes to eGain knowledge.
-- Two requests with the same new idempotency key at the same instant are not atomic on Blobs. A retry after the first finishes is safe.
-- The eGain Test panel hides some mapped values, so some checks were made in the chat itself.
+- Paste the real message as the FIRST message in the chat. If a customer first types something else, that sentence is checked as the message.
+- Proof Code verification confirms the code (one notice). It does not compare the notice text.
+- The scam rules are deliberately narrow and deterministic. A phrase like "pay now or your power is cut", with no time word, link or phone number, is not flagged. The reply then says "no matching notice" and "do not act yet".
+- The customer reference used for outbreak counting is the chat session id, so one person opening three chats could trigger an outbreak.
+- Alerts are simulated. Nobody is contacted. Approving a knowledge draft records the human approval only; nothing is uploaded to eGain knowledge.
+- The demo failure paths (`TESTFAIL`, `TESTFAILWRITE`) trigger by `company_id` only, so they are verified by unit tests and direct API calls, not from the chat. The Report Message success condition (`status === 200 && body.success === true`) is published in v2 and was tested with a normal report reference.
+- Two requests with the same new idempotency key at the same instant are not atomic. The eGain Test panel hides some mapped values.
 - The full T1-T23 run on eGain is not done yet.
 
 ## Endpoints
