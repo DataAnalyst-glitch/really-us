@@ -1,5 +1,5 @@
 # Process workflows
-Status: all four published. VERIFIED (2026-11-10, owner, live chats in the Test AI Agent and the Demo Link).
+Status: all five published (four for Northline Power, one for the second company Examplia Bank). VERIFIED (2026-11-10, owner, live chats in the Test AI Agent and the Demo Link).
 
 API base: `https://really-us-verifier.netlify.app`. `/v1/verify` is called with no authentication, by design. The two write calls (`/v1/reports`, `/v1/cases`) use the eGain External Credential named `really-us-api-key`, which sends the `X-API-Key` header. The credential value is never written in this repository.
 
@@ -67,6 +67,21 @@ Intent: I already paid or shared details.
 
 Note: the key `case-{{sessionId}}` is the same for every case in one chat, so a second case with a different reason in the same chat is rejected as a reused key.
 
+## 5. Verify Bank Message (published, second company)
+Intent: Check a message from my bank. Company: Examplia Bank (fictional).
+A copy of Verify Message v3 with a different company in the request body:
+1. Same two questions as Verify Message v3 (the message, then the sender).
+2. **API:** `POST https://really-us-verifier.netlify.app/v1/verify`, no authentication, header `Content-Type: application/json`.
+   Body: `{"company_id":"examplia_bank","message":"{{userQuery}}","sender":"{{verifySender}}"}`
+   Mappings: `customer_text`, `verdict`, `warning` (same as Verify Message v3). Success Condition `status === 200 && body.success === true`. Timeouts 5000 ms and 8000 ms, 0 retries.
+3. Same success, error and timeout statements as Verify Message v3.
+
+The API answers with Examplia Bank's own official channels (`examplia-bank.example`, `alerts@examplia-bank.example`, sender `EXAMPLIABANK`, `+1 555 0110` and `+1 555 0111`), not Northline's. Test results: `docs/TEST_PLAN.md`, "Second company".
+
+What this is and is not:
+- It is the same AI Agent and the same Pre-chat. The Pre-chat greeting was written for Northline Power ("an AI assistant for Northline Power, a fictional demo company") and is not changed for the bank.
+- The second company is a different Process workflow and a different intent. Only the verify flow is built for it. The Report Message, Open Case and Verify With Proof Code flows are for Northline only.
+
 ## Intent mapping (verified in chat)
 | Intent | Process workflow |
 |---|---|
@@ -74,6 +89,7 @@ Note: the key `case-{{sessionId}}` is the same for every case in one chat, so a 
 | Report a suspicious message | Report Message |
 | Verify with a Proof Code | Verify With Proof Code |
 | I already paid or shared details | Open Case |
+| Check a message from my bank | Verify Bank Message |
 
 Routing was stable: 5 of 5 new sessions routed the check-a-message request to Verify (R-T15 in `docs/TEST_PLAN.md`).
 

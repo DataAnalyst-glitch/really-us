@@ -96,4 +96,15 @@ These "R-T" numbers are the chat run's own numbering. They are not the T1-T23 ID
 - Report Message v2 is published with the Success Condition `status === 200 && body.success === true`. It was tested in chat with a normal report reference. The failure branch was not exercised from chat.
 - The eGain Test panel hides some mapped values.
 
+### Second company: Examplia Bank (verify flow only)
+| Check | Surface | Result |
+|---|---|---|
+| API call with `company_id` `examplia_bank` and a scam message | API test | PASS. HTTP 200, MATCHES_SCAM_SIGNS, naming Examplia Bank |
+| B1: bank scam message through "Verify Bank Message" | Test AI Agent | PASS. Answered with Examplia Bank's channels: `examplia-bank.example`, `alerts@examplia-bank.example`, sender `EXAMPLIABANK`, `+1 555 0110` and `+1 555 0111` |
+| R1: regression, Northline scam message | Test AI Agent | PASS. Unchanged |
+| R2: regression, Northline report flow | Test AI Agent | PASS. A report reference was returned |
+| R3: regression, Proof Code `NP-4821` | Test AI Agent | PASS. Genuine |
+
+Only the verify flow is built for the second company. The report, case and Proof Code flows are Northline only, so they were not run for the bank. The agent and the Pre-chat greeting are shared and written for Northline.
+
 Cells in the T1-T23 table that are not updated above are NOT RUN on eGain.
