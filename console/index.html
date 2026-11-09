@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Northline Power (demo)</title>
+  <style>
+    :root { --navy: #12263f; --teal: #0f766e; --teal-dark: #0b5a54; --amber-bg: #fef3c7; --amber: #92400e; --line: #cbd5e1; --bg: #f8fafc; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 17px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--navy); background: var(--bg); }
+    .demo-banner { background: var(--amber-bg); color: var(--amber); padding: 10px 16px; text-align: center; font-weight: 600; border-bottom: 1px solid #f59e0b; }
+    header, main, footer { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+    header { padding-top: 20px; padding-bottom: 8px; display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+    header strong { font-size: 24px; }
+    .tag { font-size: 14px; background: var(--amber-bg); color: var(--amber); border-radius: 4px; padding: 2px 8px; font-weight: 600; }
+    h1 { font-size: 30px; line-height: 1.25; margin: 24px 0 8px; }
+    h2 { font-size: 21px; margin: 32px 0 8px; }
+    p { margin: 8px 0; }
+    .cta { display: inline-block; min-height: 44px; padding: 10px 22px; background: var(--teal); color: #fff; font-weight: 700; text-decoration: none; border-radius: 6px; margin-top: 8px; }
+    .cta:hover, .cta:focus { background: var(--teal-dark); }
+    a:focus-visible, .cta:focus-visible { outline: 3px solid var(--navy); outline-offset: 2px; }
+    .card { background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 16px; margin-top: 12px; }
+    .slot { border: 2px dashed var(--teal); }
+    code { background: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-size: 1.05em; }
+    ul { padding-left: 22px; margin: 8px 0; }
+    li { margin: 4px 0; }
+    footer { padding: 24px 16px 40px; font-size: 15px; color: #334155; }
+  </style>
+</head>
+<body>
+  <div class="demo-banner" role="note">DEMO. Northline Power is a fictional company. All names, numbers, accounts and notices on this page are made up.</div>
+
+  <header>
+    <strong>Northline Power</strong>
+    <span class="tag">Fictional demo</span>
+  </header>
+
+  <main>
+    <h1>Got a message from us? Check it.</h1>
+    <p>Messages that say your power will be cut tonight are often fake. Only Northline can tell you whether a message is really from us.</p>
+    <a class="cta" href="#check">Check a message</a>
+
+    <h2 id="check">Check a message</h2>
+    <div class="card slot" id="egain-widget-slot">
+      <!-- The eGain chat widget script is added here by a person after the agent is published. -->
+      <p><strong>Chat opens here.</strong> The eGain chat widget loads in this spot once the agent is published. Until then this box is empty.</p>
+      <p>You paste the message. You get a result with three reasons and one next step.</p>
+    </div>
+
+    <h2>Your latest notice (fictional)</h2>
+    <div class="card">
+      <p>Notice for demo account <code>DEMO-NP-1001</code>: your next bill is ready.</p>
+      <p>Proof Code: <code>NP-4821</code></p>
+      <p>A Proof Code confirms that one notice only. Give it to the chat to check it. It does not show any account details.</p>
+    </div>
+
+    <h2>How we really contact you</h2>
+    <div class="card">
+      <ul>
+        <li>Website: northline.example</li>
+        <li>Email: notices@northline.example</li>
+        <li>Text message sender name: NLPOWER</li>
+        <li>Demo support phone: +1 555 0100</li>
+        <li>Demo fraud desk phone: +1 555 0101</li>
+        <li>Paper bill mailed to your service address</li>
+      </ul>
+      <p>If a message asks you to call, click or pay somewhere else, do not. Contact us through the list above.</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>Demo data only. This page is part of a hackathon demo. It is not a real utility and not a real service.</p>
+    <p><a href="trust.html">Operator view (needs a demo key)</a></p>
+  </footer>
+</body>
+</html>
