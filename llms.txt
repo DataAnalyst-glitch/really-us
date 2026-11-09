@@ -1,0 +1,12 @@
+# Really Us?
+> eGain-based customer-service agent that verifies whether a message using a company's name is genuine. Fictional demo data only.
+
+- [Judge guide and rule-to-evidence map](docs/JUDGES.md)
+- [Hackathon rules checklist](docs/HACKATHON_RULES.md)
+- [PRD](docs/PRD.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [Technology and API contract](docs/TECHNOLOGY.md)
+- [Design and UX](docs/DESIGN.md)
+- [Test plan and results](docs/TEST_PLAN.md)
+- [eGain friction log](docs/FRICTION_LOG.md)
+- [Decisions](docs/DECISIONS.md)
