@@ -20,10 +20,10 @@ Note: After creation the eGain settings box shows an empty URL field, but the De
 The Trust Console is protected by a demo key and is shown in the demo video. Judges who want to try it can email contact@srdevelopers.live to request a temporary key. It controls fictional demo data only.
 
 ## Checklist
-- [ ] Agent trained, tested, published
+- [x] Agent trained, tested, published (published demo link and Test AI Agent checked 12-13 Nov 2026; see README "Live validation on the published agent")
 - [x] Content authorized, no sensitive data (fictional content only; secrets scan of the tree and full history on 2026-11-10 found none; see docs/DECISIONS.md)
 - [x] Pre-chat, escalation, process work; process on an intent (owner-verified 2026-11-10; see egain/)
-- [ ] Demo link works in a clean browser
+- [ ] Demo link works in a clean browser (works without login in new tabs, 12-13 Nov; not re-checked in a private window or another browser)
 - [x] Description complete (148 words, within the 150-word limit; checked by `scripts/harness_check.py`)
-- [ ] 1-minute video complete
-- [ ] Submitted on every required channel
+- [x] 1-minute video complete (59 s, public: https://youtu.be/PRNmeJox_NE)
+- [x] Submitted on every required channel (eGain submission form and Devpost, 12-13 Nov 2026)
