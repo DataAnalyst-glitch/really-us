@@ -6,6 +6,9 @@ Target: before 13 Nov 2026 10:00 IST unless the organizers confirm a later date.
 ## Description (under 150 words)
 Really Us Message Verifier helps customers of a utility check a suspicious text, email or call before they act. It aims to give customers a clear answer and to give support teams earlier warning of scam waves. A customer pastes the message into the eGain chat. A workflow sends it to a small API that returns a deterministic verdict, three plain reasons and one next step. A Proof Code printed on a real notice can confirm that one notice. Customers can report a sender or open a case. When three different chat sessions report the same sender, the Trust Console suggests an outbreak alert, and a person must approve it before later customers see the warning. People also approve knowledge drafts. The AI suggests; the workflow decides; a human approves. A second fictional company, Examplia Bank, runs the verify flow on the same API. All data is fictional.
 
+## Scope
+Reusable template, not a multi-company platform. A new company is added by hand (see `docs/ONBOARDING.md`); there is no per-company data separation and no per-company key.
+
 ## Links
 Note: After creation the eGain settings box shows an empty URL field, but the Demo Link itself works, so the link is kept in this repository.
 
