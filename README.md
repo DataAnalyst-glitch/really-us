@@ -160,6 +160,7 @@ Not run on the published agent: API-down behaviour. The full T1–T23 matrix in 
 
 ## Known limits
 
+- When the rules look for a phone number inside a message, official numbers are matched on their last 7 digits (api/src/verdict.ts), so a different number ending in the same 7 digits would not raise the "unofficial phone" signal. A production version should compare the full normalised number.
 - Outbreaks count distinct chat sessions, not verified people; one person opening three chats could trigger a suspected outbreak. This is why a person must approve every outbreak before any warning is shown.
 - Paste the real message as the FIRST message in the chat. If a customer first types something else, that sentence is checked as the message.
 - Proof Code verification confirms the code (one notice). It does not compare the notice text.
