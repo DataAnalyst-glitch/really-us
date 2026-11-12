@@ -40,7 +40,7 @@ Assert on state, not only wording. Status: NOT RUN, PASS, FAIL. Record date and 
 | 2026-11-09 | Test AI Agent | Retest: power cut tonight, after KB-03 update | PASS: no account-level certainty, sources shown | Add paste prompt via instructions and workflow |
 
 ## Run on 2026-11-10
-Owner-verified chats, in the eGain Test AI Agent and through the Demo Link. Only what was actually run is listed. The T1-T23 table above is not updated by this run: its eGain Test and Published columns stay NOT RUN until the full run is done.
+Owner-verified chats, in the eGain Test AI Agent and through the Demo Link. Only what was actually run is listed. This 10 Nov run did not change the T1-T23 table. On 12-13 Nov the Published column was updated only for rows that were checked live (T1, T3, T10, T14, T24); every other row stays NOT RUN until a full run is done.
 
 | Chat | Surface | Outcome |
 |---|---|---|
