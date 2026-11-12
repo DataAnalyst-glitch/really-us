@@ -15,6 +15,8 @@ export interface Deps {
 }
 
 const MAX_MESSAGE_LENGTH = 600; // eGain paste Max Length (TECHNOLOGY.md)
+export const MAX_SENDER_LENGTH = 100; // longer sender text is cut to this length, not rejected
+const capSender = (v: unknown): unknown => (typeof v === "string" ? v.trim().slice(0, MAX_SENDER_LENGTH) : v);
 const DAMAGE_REASONS = ["ALREADY_PAID", "SHARED_DETAILS", "CLICKED_LINK", "INSTALLED_APP"];
 const PRIORITIES = ["P1", "P2", "P3"];
 const OUTBREAK_WARNING = "Several customers have reported this sender. Treat it with care.";
@@ -124,7 +126,7 @@ export async function handleVerify(deps: Deps, body: unknown): Promise<ApiResult
   }
   const demo_account = asText(b.demo_account)?.trim();
   const suppliedCode = asText(b.proof_code);
-  const sender = asText(b.sender);
+  const sender = asText(capSender(b.sender));
 
   // Facts first (lookups), then a pure decision.
   const signals = detectScamSigns(config, b.message);
@@ -173,7 +175,7 @@ export async function handleSenderLookup(deps: Deps, input: { company_id?: unkno
 // ---- POST /v1/reports ----------------------------------------------------------
 
 export async function handleReport(deps: Deps, body: unknown): Promise<ApiResult> {
-  const b = isRecord(body) ? body : {};
+  const b: Record<string, unknown> = isRecord(body) ? { ...body, sender: capSender(body.sender) } : {};
   const resolved = resolveCompany(deps, b.company_id);
   if (resolved.kind === "unknown" || resolved.kind === "testfail") return fail(400, "UNKNOWN_COMPANY");
   const company_id = String(b.company_id);
