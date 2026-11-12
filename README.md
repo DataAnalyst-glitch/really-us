@@ -51,17 +51,24 @@ Note: After creation the eGain settings box shows an empty URL field, but the De
 ## Known limits
 - Paste the real message as the FIRST message in the chat. If a customer first types something else, that sentence is checked as the message.
 - Proof Code verification confirms the code (one notice). It does not compare the notice text.
-- The scam rules are deliberately narrow and deterministic. A phrase like "pay now or your power is cut", with no time word, link or phone number, is not flagged. The reply then says "no matching notice" and "do not act yet".
+- The scam rules are deliberately narrow and deterministic. A message with none of the listed signs, such as "Your bill is overdue. Reply YES to pay.", is not flagged. The reply then says "no matching notice" and "do not act yet".
+- The rules are narrow. On our own 20-sample set (written by us after review, not an independent evaluation; `api/test/sample-set.test.ts`) the result before the fix was 10 of 10 genuine notices flagged and 10 of 10 scams missed; after the fix it is 0 genuine flagged and 0 scams missed. The set was used to write the fix, so it does not measure how the rules do on new messages.
+- Proof Codes are demo-only: static, reusable and guessable (10,000 possible codes per company). A production design needs per-notice one-time codes and rate limiting.
+- `POST /v1/verify` has no rate limit.
+- `GET /v1/senders/{hash}` needs no key, and the sender hash is an unsalted SHA-256, so anyone can hash a sender and look up its report count.
 - The customer reference used for outbreak counting is the chat session id, so one person opening three chats could trigger an outbreak.
 - Alerts are simulated. Nobody is contacted. Approving a knowledge draft records the human approval only; nothing is uploaded to eGain knowledge.
 - The demo failure paths (`TESTFAIL`, `TESTFAILWRITE`) trigger by `company_id` only, so they are verified by unit tests and direct API calls, not from the chat. The Report Message success condition (`status === 200 && body.success === true`) is published in v2 and was tested with a normal report reference.
 - The keys `rep-{{sessionId}}` and `case-{{sessionId}}` repeat inside one chat. A second report or case in the same chat with different details is rejected by the API (409), and the customer sees the error text.
 - The Report body sends a `message` field. The API ignores it and does not store it.
-- Two requests with the same new idempotency key at the same instant are not atomic. The eGain Test panel hides some mapped values.
+- Concurrent duplicate requests are not fully atomic: two requests with the same new idempotency key at the same instant can both run (unchanged). The eGain Test panel hides some mapped values.
 - The full T1-T23 run on eGain is not done yet.
 
 ## Endpoints
 `POST /v1/verify`, `GET /v1/senders/{hash}`, `POST /v1/reports` and `POST /v1/cases` (`X-API-Key`), and the Trust Console endpoints (`X-Demo-Key`): `GET /v1/console/state`, `POST /v1/outbreaks/{id}/approve`, `POST /v1/outbreaks/{id}/draft`, `POST /v1/drafts/{id}/approve`, `POST /v1/demo/reset`. Details: [docs/TECHNOLOGY.md](docs/TECHNOLOGY.md).
+
+## Testing
+The Trust Console is protected by a demo key and is shown in the demo video. Judges who want to try it can email contact@srdevelopers.live to request a temporary key. It controls fictional demo data only.
 
 ## Run
 `make verify` runs the harness checks and tests. Keys are set as environment variables (`API_KEY`, `DEMO_KEY`, `DEMO_DATA_ONLY`); see `.env.example` for the names. Never commit values.

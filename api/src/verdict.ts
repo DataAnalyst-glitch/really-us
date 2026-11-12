@@ -3,29 +3,70 @@ import type { CompanyConfig, DetectedSignal, VerdictFacts, VerdictResult } from 
 // ---- Detecting signals (pure) -------------------------------------------------
 
 const LINK = /\b(?:https?:\/\/)?((?:[a-z0-9-]+\.)+[a-z]{2,})(?:[/:?#]\S*)?/gi;
+const IP_LINK = /\bhttps?:\/\/\d{1,3}(?:\.\d{1,3}){3}\b|\b\d{1,3}(?:\.\d{1,3}){3}\//i; // http://192.0.2.7 or 192.0.2.7/pay
+const HIDDEN_DOT_LINK = /\b[a-z0-9-]+\s*[[(]\s*(?:\.|dot)\s*[\])]\s*[a-z]{2,}/i; // northline[.]pay
+const FILE_EXTENSIONS = new Set(["pdf", "doc", "docx", "xls", "xlsx", "csv", "txt", "jpg", "jpeg", "png", "gif", "heic"]);
 const PHONE = /\+?\d[\d\s\-().]{6,}\d/g;
-const CONTACT_CUE = /\b(call|phone|ring|text|message|whatsapp|sms|contact|reply)\b/i;
+const DATE = /\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}\/\d{1,2}\/\d{2,4}\b/g;
+const NUMBER_LABEL_BEFORE = /\b(account|acct|reference|ref|invoice|order|customer)\s*(number|no\.?|#)?\s*:?\s*$/i;
+const CONTACT_CUE = /\b(call|dial|phone|ring|text|message|whatsapp|sms|contact|reply)\b/i;
+// A signal match is ignored when a negation sits just before it in the same clause:
+// "We will never ask for your PIN" is safety advice, not a request.
+const NEGATION = /\b(never|will not|won't|do not|don't|does not|doesn't)\b/i;
+const NEGATION_WINDOW = 40;
 
 const digitsOnly = (s: string) => s.replace(/\D/g, "");
+const last7 = (digits: string) => digits.slice(-7);
+
+function negated(message: string, index: number): boolean {
+  const before = message.slice(Math.max(0, index - NEGATION_WINDOW), index);
+  const clause = before.split(/[.!?;:\n]/).pop() ?? "";
+  return NEGATION.test(clause);
+}
+
+// A dotted word counts as a link unless it is plainly not one: a file name ("statement.pdf") or a
+// missing space after a full stop ("ready.Thanks"). A scheme, "www." or a path always makes it a link.
+function looksLikeLink(full: string, host: string): boolean {
+  const scheme = /^https?:\/\//i.exec(full)?.[0] ?? "";
+  if (scheme || /^www\./i.test(host) || full.length > scheme.length + host.length) return true;
+  const labels = host.split(".");
+  const tld = labels[labels.length - 1] ?? "";
+  if (FILE_EXTENSIONS.has(tld.toLowerCase())) return false;
+  if (labels.length === 2 && /[a-z]$/.test(labels[0] ?? "") && /^[A-Z][a-z]{3,}$/.test(tld)) return false;
+  return true;
+}
 
 export function detectScamSigns(config: CompanyConfig, message: string): DetectedSignal[] {
   const found: DetectedSignal[] = [];
 
   for (const s of config.scam_signals) {
-    if (new RegExp(s.pattern, "i").test(message)) found.push({ id: s.id, reason: s.reason });
+    const matches = [...message.matchAll(new RegExp(s.pattern, "gi"))];
+    if (matches.some((m) => !negated(message, m.index ?? 0))) found.push({ id: s.id, reason: s.reason });
   }
 
-  // A link to anything other than the company's own domains.
+  // A link to anything other than the company's own domains, an IP-address link, or a hidden-dot link.
   const domains = config.notice_rules.official_domains.map((d) => d.toLowerCase());
-  const hosts = [...message.matchAll(LINK)].map((m) => (m[1] ?? "").toLowerCase());
-  if (hosts.some((h) => !domains.some((d) => h === d || h.endsWith("." + d)))) {
+  const hosts = [...message.matchAll(LINK)]
+    .filter((m) => looksLikeLink(m[0], m[1] ?? ""))
+    .map((m) => (m[1] ?? "").toLowerCase());
+  if (
+    hosts.some((h) => !domains.some((d) => h === d || h.endsWith("." + d))) ||
+    IP_LINK.test(message) ||
+    HIDDEN_DOT_LINK.test(message)
+  ) {
     found.push({ id: "unofficial_link", reason: "It contains a link to a website that is not an official one." });
   }
 
-  // Asks you to contact a phone number that is not an official one.
-  const officialDigits = new Set(config.official_senders.map(digitsOnly).filter((d) => d.length >= 7));
-  const numbers = (message.match(PHONE) ?? []).map(digitsOnly).filter((d) => d.length >= 7);
-  if (CONTACT_CUE.test(message) && numbers.some((n) => !officialDigits.has(n))) {
+  // Asks you to contact a phone number that is not an official one. Dates and labelled account or
+  // reference numbers are not phone numbers. Official numbers match on their last 7 digits, so
+  // "555 0100" and "+1 555 0100" are the same number.
+  const officialDigits = new Set(config.official_senders.map(digitsOnly).filter((d) => d.length >= 7).map(last7));
+  const text = message.replace(DATE, " ");
+  const numbers = [...text.matchAll(PHONE)]
+    .filter((m) => !NUMBER_LABEL_BEFORE.test(text.slice(Math.max(0, (m.index ?? 0) - 30), m.index)))
+    .map((m) => digitsOnly(m[0]))
+    .filter((d) => d.length >= 7);
+  if (CONTACT_CUE.test(message) && numbers.some((n) => !officialDigits.has(last7(n)))) {
     found.push({ id: "unofficial_phone", reason: "It asks you to call or message a phone number that is not an official one." });
   }
 

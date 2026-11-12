@@ -149,7 +149,8 @@ export interface Storage {
   listAlerts(): Promise<Alert[]>;
 
   addAudit(event: AuditEvent): Promise<void>;
-  listAudit(): Promise<AuditEvent[]>;
+  listAudit(): Promise<AuditEvent[]>; // Blobs storage returns only the newest 50 events
+
 
   saveDraft(draft: KnowledgeDraft): Promise<void>;
   getDraft(draft_id: string): Promise<KnowledgeDraft | undefined>;

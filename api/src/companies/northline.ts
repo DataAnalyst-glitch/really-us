@@ -22,8 +22,13 @@ export const northline: CompanyConfig = {
     {
       id: "urgent_cutoff",
       reason: "It says your power will be cut today or tonight.",
+      // A "planned maintenance" sentence with no payment word before the cut is not a threat.
       pattern:
-        "(cut|disconnect|shut\\s*off|suspend)\\w*[^.]{0,60}\\b(today|tonight|immediately|within\\s+\\d+\\s*(hour|minute|min)s?)\\b|\\b(today|tonight)\\b[^.]{0,60}(cut|disconnect|shut\\s*off|suspend)",
+        "(?<!planned\\s+(?:maintenance|work)\\b(?:(?!\\b(?:pay|fee|owe|overdue)\\b)[^.]){0,60})" +
+        "(cut|disconnect|shut\\s*off|suspend)\\w*[^.]{0,60}\\b(today|tonight|immediately|(within|in)\\s+\\d+\\s*(hour|minute|min)s?)\\b" +
+        "|(?<!planned\\s+(?:maintenance|work)\\b(?:(?!\\b(?:pay|fee|owe|overdue)\\b)[^.]){0,60})" +
+        "\\b(today|tonight)\\b[^.]{0,60}(cut|disconnect|shut\\s*off|suspend)" +
+        "|\\bpay\\b[^.]{0,20}\\b(now|today|immediately)\\b[^.]{0,10}\\bor\\b[^.]{0,40}(cut|disconnect|shut\\s*off|suspend)",
     },
     ...commonSignals,
   ],

@@ -42,7 +42,7 @@ Allow up to 5 minutes after publishing for changes to appear.
 ## Known limits
 - Paste the real message as the FIRST message in the chat. If a customer first types something else, that sentence is checked as the message.
 - Proof Code verification confirms the code (one notice). It does not compare the notice text.
-- The scam rules are deliberately narrow and deterministic. A phrase like "pay now or your power is cut", with no time word, link or phone number, is not flagged. The reply then says "no matching notice" and "do not act yet".
+- The scam rules are deliberately narrow and deterministic. A message with none of the listed signs, such as "Your bill is overdue. Reply YES to pay.", is not flagged. The reply then says "no matching notice" and "do not act yet".
 - The customer reference used for outbreak counting is the chat session id, so one person opening three chats could trigger an outbreak.
 - Alerts are simulated. Nobody is contacted. Approving a knowledge draft records the human approval only; nothing is uploaded to eGain knowledge.
 - The demo failure paths (`TESTFAIL`, `TESTFAILWRITE`) trigger by `company_id` only, so they are verified by unit tests and direct API calls, not from the chat. The Report Message success condition (`status === 200 && body.success === true`) is published in v2 and was tested with a normal report reference.

@@ -6,7 +6,7 @@ All responses include `demo_data: true`. Writes return `success`. Auth: `X-API-K
 ## Contract
 | Endpoint | Input | Output |
 |---|---|---|
-| `POST /v1/verify` | `company_id, message, demo_account?, proof_code?` | `success, verdict, reasons[3], next_step, sender_hash, report_count, warning` |
+| `POST /v1/verify` | `company_id, message, demo_account?, proof_code?, sender?` (sender is cut to 100 characters) | `success, verdict, reasons[3], next_step, customer_text, sender_hash, report_count, warning` |
 | `GET /v1/senders/{hash}` | `company_id` | `report_count, warning, status` |
 | `POST /v1/reports` | `company_id, sender, customer_ref, confirmed, idempotency_key` | `success, report_id, report_count, outbreak_status` |
 | `POST /v1/cases` | `company_id, priority, reason, summary, confirmed, idempotency_key` | `success, case_id, priority` |
@@ -19,7 +19,12 @@ All responses include `demo_data: true`. Writes return `success`. Auth: `X-API-K
 `/v1/verify` also returns `customer_text`, one plain string for chat (max 900 characters, no brackets or line breaks). It carries the outbreak warning as "Heads-up: ..." after the opening line only when `warning` is non-null, which happens only for an approved outbreak; otherwise it has no warning text. `/v1/reports` and `/v1/cases` need `X-API-Key`.
 
 Verdict logic is deterministic rules from company config. No LLM decides a verdict.
-Rules: valid Proof Code or account notice -> GENUINE; scam signals and no notice -> MATCHES_SCAM_SIGNS; otherwise NO_MATCHING_NOTICE.
+Rules, in order (from `api/src/verdict.ts`; the `TESTFAIL` error comes first and gives no verdict):
+1. A wrong Proof Code never gives GENUINE: MATCHES_SCAM_SIGNS if scam signs are found, otherwise NO_MATCHING_NOTICE.
+2. Scam signs give MATCHES_SCAM_SIGNS, even when a notice or a valid Proof Code exists.
+3. No scam signs, and either a valid Proof Code or an account notice plus an official sender: GENUINE_NOTICE_FOUND.
+4. An account notice with a missing or non-official sender: NO_MATCHING_NOTICE.
+5. Otherwise NO_MATCHING_NOTICE.
 Test locality: company `TESTFAIL` forces a 500 for failure-path demos.
 
 ## Company config

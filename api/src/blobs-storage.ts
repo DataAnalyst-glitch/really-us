@@ -16,6 +16,7 @@ export interface BlobStoreLike {
 // Known limit: Blobs has no transactions. Two requests with the same new idempotency key at the
 // same instant could both run. Retries after the first finishes are safe. See docs/DECISIONS.md.
 const enc = encodeURIComponent;
+export const AUDIT_READ_LIMIT = 50; // the console feed shows at most 50 events
 
 export function createBlobsStorage(store: BlobStoreLike, notices: Notice[] = fixtureNotices): Storage {
   let seq = 0;
@@ -92,8 +93,13 @@ export function createBlobsStorage(store: BlobStoreLike, notices: Notice[] = fix
     async addAudit(event) {
       await store.setJSON(`audit/${event.event_id}`, event);
     },
+    // Reads only the newest AUDIT_READ_LIMIT events (keys are time-ordered), so a long audit log
+    // cannot slow down the console. Reset still deletes every key.
     async listAudit() {
-      return oldestFirst(await readAll<AuditEvent>("audit/"), (e) => e.event_id);
+      const { blobs } = await store.list({ prefix: "audit/" });
+      const newest = blobs.map((b) => b.key).sort().slice(-AUDIT_READ_LIMIT);
+      const items = await Promise.all(newest.map((key) => read<AuditEvent>(key)));
+      return oldestFirst(items.filter((v): v is AuditEvent => v !== undefined), (e) => e.event_id);
     },
 
     async saveDraft(draft) {

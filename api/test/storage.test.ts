@@ -86,6 +86,51 @@ describe.each(adapters)("storage contract: %s", (_name, make) => {
   });
 });
 
+describe("Blobs audit log: only the newest 50 events are read", () => {
+  it("returns the newest 50 of 60 events, oldest first, and reset still deletes all 60", async () => {
+    const store = fakeBlobStore();
+    const s = createBlobsStorage(store);
+    const ids = Array.from({ length: 60 }, () => s.nextId("EV"));
+    for (const event_id of ids) await s.addAudit({ event_id, type: "t", company_id: null, detail: {}, created_at: NOW });
+    expect((await s.listAudit()).map((e) => e.event_id)).toEqual(ids.slice(-50));
+    expect((await store.list({ prefix: "audit/" })).blobs).toHaveLength(60);
+    await s.reset();
+    expect((await store.list()).blobs).toHaveLength(0);
+  });
+
+  it("console state still works with a long audit log, newest event first", async () => {
+    const { handleConsoleState } = await import("../src/console.js");
+    const s = createBlobsStorage(fakeBlobStore());
+    const ids = Array.from({ length: 60 }, () => s.nextId("EV"));
+    for (const event_id of ids) await s.addAudit({ event_id, type: "t", company_id: null, detail: {}, created_at: NOW });
+    const res = await handleConsoleState({ storage: s, env: { DEMO_KEY: KEY } }, { demo_key: KEY });
+    expect(res.status).toBe(200);
+    const feed = res.body.feed as Array<{ event_id: string }>;
+    expect(feed).toHaveLength(50);
+    expect(feed[0]?.event_id).toBe(ids[59]);
+  });
+});
+
+describe("sender is capped at 100 characters", () => {
+  const deps = (): Deps => ({ storage: createMemoryStorage(), env: { DEMO_DATA_ONLY: "true", DEMO_KEY: KEY }, now: () => NOW });
+  const long = "S".repeat(100) + "X".repeat(600);
+
+  it("verify hashes only the first 100 characters", async () => {
+    const res = await handleVerify(deps(), { company_id: "northline", message: "I want to check a message", sender: long });
+    expect(res.status).toBe(200);
+    expect(res.body.sender_hash).toBe(hashSender("S".repeat(100)));
+  });
+
+  it("a report stores a masked sender of at most 100 characters", async () => {
+    const d = deps();
+    const res = await handleReport(d, { company_id: "northline", sender: long, customer_ref: "C1", confirmed: true, idempotency_key: "cap-1" });
+    expect(res.body.success).toBe(true);
+    const [stored] = await d.storage.listReports("northline");
+    expect(stored?.sender_hash).toBe(hashSender("S".repeat(100)));
+    expect(stored?.sender_masked.length).toBeLessThanOrEqual(100);
+  });
+});
+
 describe("persistence through the Blobs adapter (a new adapter over the same store is a new invocation)", () => {
   const depsFor = (storage: Storage): Deps => ({ storage, env: { DEMO_DATA_ONLY: "true", DEMO_KEY: KEY }, now: () => NOW });
   const reportBody = (ref: string, key: string) => ({ company_id: "northline", sender: SENDER, customer_ref: ref, confirmed: true, idempotency_key: key });
