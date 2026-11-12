@@ -13,11 +13,11 @@ Status values: PLANNED, BUILT, VERIFIED. Update with evidence links as work comp
 | Escalation, 2+ options | `egain/escalation.md` | VERIFIED | Call and Email the fraud desk; Direct, Knowledge Gap and Thumbs Down fired (owner, 2026-11-10) |
 | Process workflow on an intent | `egain/workflows.md` | VERIFIED | Four Process workflows mapped to intents and run in chat (owner, 2026-11-10) |
 | Actions | Reports and cases via API | BUILT | `api/test/writes.test.ts`, `api/test/http.test.ts`. Report and case flows ran in chat and returned a report reference and a case number (owner, 2026-11-10). "Actions enabled and added to the AI Agent" is not recorded |
-| Validation in Test AI Agent and demo link | `docs/TEST_PLAN.md` | BUILT | "Run on 2026-11-10" lists the chats run: Part A (7 cases) and R-T1 to R-T16, with FAILs that are one finding (the demo failure triggers cannot be reached from chat). The full T1-T23 run is NOT done |
+| Validation in Test AI Agent and demo link | `docs/TEST_PLAN.md` | BUILT | "Run on 2026-11-10" lists the chats run: Part A (7 cases) and R-T1 to R-T16, with FAILs that are one finding (the demo failure triggers cannot be reached from chat). The full T1-T23 run was not re-run end to end. On 12-13 Nov the core flows and T24 (6 new-rule samples) were checked in the published demo link; see README "Live validation on the published agent" |
 | Fictional data, authorized content | `knowledge/`, API fixtures | BUILT | `api/src/fixtures.ts`, `api/src/companies/`, `console/index.html` |
 | Second fictional company, Examplia Bank (beyond the checklist) | `egain/workflows.md` (Verify Bank Message) | VERIFIED | API test and chat checks passed on 2026-11-10 (owner): bank scam message answered with Examplia Bank channels; Northline scam, report and Proof Code unchanged. Verify flow only; same agent and Northline-written Pre-chat greeting |
 | Outbreak, Trust Console, Scam Vaccine, Knowledge Loop (beyond the checklist) | `api/src/console.ts`, `console/trust.html` | BUILT | `api/test/console.test.ts`, `api/test/http-console.test.ts`, `api/test/console-pages.test.ts`. Outbreak end to end verified in production (owner, 2026-11-10): 3 chat sessions, Suspected, person approval, warning shown to the next customer, draft created and approved |
-| 150 words and 1-minute video | `docs/SUBMISSION.md` | PLANNED | |
+| 150 words and 1-minute video | `docs/SUBMISSION.md`, https://youtu.be/PRNmeJox_NE | VERIFIED | 148-word description and 59-second video submitted on Devpost and the eGain form (12-13 Nov 2026) |
 
 ## Scoring guide
 | Criterion | Points | Where to look |
@@ -52,5 +52,5 @@ Allow up to 5 minutes after publishing for changes to appear.
 - The keys `rep-{{sessionId}}` and `case-{{sessionId}}` repeat inside one chat. A second report or case in the same chat with different details is rejected by the API (409), and the customer sees the error text.
 - The Report body sends a `message` field. The API ignores it and does not store it.
 - Two requests with the same new idempotency key at the same instant are not atomic. The eGain Test panel hides some mapped values.
-- The full T1-T23 run on eGain is not done yet.
-- Not done yet: the video, the final description edit, the submission channel, participant information and the terms review.
+- The full T1-T23 run on eGain was not re-run end to end; only the core flows and T24 were re-checked on the published agent (12-13 Nov).
+- Done: video, final description, Devpost and eGain submissions, participant information. Outbreaks count chat sessions, not verified people.
