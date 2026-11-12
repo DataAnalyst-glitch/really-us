@@ -1,5 +1,13 @@
 # Really Us?
-**Everyone tries to spot the fake. We prove the real.**
+**Scammers pretend to be your company. Really Us lets customers check before they act, and warns the next customer once a person approves.**
+
+People reported losing $3.5 billion to impostor scams in the US in 2025, nearly 1 in 3 fraud reports ([U.S. FTC, June 2026](https://www.ftc.gov/news-events/news/press-releases/2026/06/ftc-data-show-people-reported-losing-3-point-5-billion-imposter-scams-2025)).
+
+- **Demo video:** VIDEO_URL_HERE
+- **Demo Link (eGain agent, opens without a code):** [open the chat](https://ai.egain.cloud/d3y6/system/web/apps/aiagent/demo.html?agentId=714122e0-9c7e-4143-8554-12afacbf3728&backgroundUrl=https://cdn.aiagent.egain.cloud/TMPRODB52840291/screenshots/7ac7046c-bc4b-4b04-b0af-a67ce25d3f2c.png)
+- **Trust Console:** https://really-us-verifier.netlify.app/trust.html (demo key on email request, see "Testing")
+
+*Everyone tries to spot the fake. We prove the real.*
 
 **TL;DR**
 - An eGain AI Agent that answers "Is this message really from us?" for a utility's customers.
@@ -17,17 +25,58 @@ lets them ask the only party that knows: the company named in the message.
 |---|---|
 | Try the agent | [Demo Link](https://ai.egain.cloud/d3y6/system/web/apps/aiagent/demo.html?agentId=714122e0-9c7e-4143-8554-12afacbf3728&backgroundUrl=https://cdn.aiagent.egain.cloud/TMPRODB52840291/screenshots/7ac7046c-bc4b-4b04-b0af-a67ce25d3f2c.png) (opens without a code) |
 | See the live demo site | [https://really-us-verifier.netlify.app](https://really-us-verifier.netlify.app) |
-| See the 1-minute video | `TO_ADD_AFTER_RECORDING` |
+| See the 1-minute video | VIDEO_URL_HERE |
 | Check every rule against evidence | [docs/JUDGES.md](docs/JUDGES.md) |
 | See test results | [docs/TEST_PLAN.md](docs/TEST_PLAN.md) |
 | Understand the design | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
 | Read platform feedback for eGain | [docs/FRICTION_LOG.md](docs/FRICTION_LOG.md) |
 
-## What it does
-1. **Checks** a pasted message against official guidance and a demo account.
-2. **Explains** one of three verdicts with 3 reasons and one next step.
-3. **Acts** after confirmation: reports the sender or opens a fraud case.
-4. **Learns**: 3 distinct reports suggest an outbreak; a person approves a simulated alert and a knowledge draft in the Trust Console. Nothing is sent or published automatically.
+## Judging map
+| Criterion (points) | Evidence in this repo / live | How to try it |
+|---|---|---|
+| Customer & business value (25) | FTC figure above; one clear verdict, 3 reasons, one next step; earlier warning of scam waves for support teams (`docs/PRD.md`) | Paste a scam text as the first chat message |
+| Functionality & reliability (25) | 296 of 296 API tests in 15 files and the harness pass; owner chat runs in `docs/TEST_PLAN.md` | `make verify`, or the chats in "How to test" |
+| Action & good judgment (25) | Writes need `confirmed=true` and an `idempotency_key`; three verdicts only; outbreak warning needs a person's approval (`api/src/handlers.ts`, `api/src/outbreak.ts`) | Report a sender, answer Yes or No; approve an outbreak in the Trust Console |
+| Effective use of eGain (20) | Knowledge, Pre-chat, Process workflows on intents, Escalation, API calls with an External Credential (`egain/`, `docs/JUDGES.md`) | Demo Link; "I want to talk to a human agent" |
+| Creativity & customer experience (15) | Proof Code on a real notice; "Heads-up" for the next customer; second company on the same API | `I have a Proof Code`, then `NP-4821` |
+| Demo video & storytelling (15) | Video: VIDEO_URL_HERE; story in `docs/DESIGN.md` | Watch the video |
+
+## Feature tour
+| Feature | What it does | First message to try |
+|---|---|---|
+| Verify | Deterministic verdict (`MATCHES_SCAM_SIGNS`, `NO_MATCHING_NOTICE`, `GENUINE_NOTICE_FOUND`), 3 reasons, one next step | Paste the suspicious message, then give the sender |
+| Proof Code | A code printed on a real notice confirms that one notice | "I have a Proof Code", then `NP-4821` |
+| Report | Reports a sender after a Yes; returns a reference `RPT-...` | "Report a suspicious message" |
+| Open Case | Opens a fraud case after a Yes; returns a case number; no recovery promise | "I already paid" |
+| Outbreak + human approval | 3 different chat sessions report one sender: suspected, no warning. After a person approves in the Trust Console, the next customer who names that sender sees "Heads-up" | Report the same sender from 3 new chats, approve, then verify a message from it |
+| Knowledge drafts | The console creates a draft from an outbreak; a person approves it. Nothing is uploaded to eGain knowledge | Trust Console, on an approved outbreak |
+| Knowledge answers | Grounded answers with sources | "How does disconnection for non-payment work?", "What is a Proof Code?" |
+| Examplia Bank | Second fictional company; verify flow on the same API | "Examplia Bank security: confirm your password and username to unlock your account.", then sender "unknown" |
+| Escalation | Two choices: Call or Email the fraud desk (fictional contacts) | "I want to talk to a human agent" |
+| Pre-chat greeting | Says it is an AI assistant for a fictional company and asks the customer not to share passwords, OTPs or card numbers; then asks for the message | Open the Demo Link |
+| Audit log | Records ids and outcomes (no message text, no sender); shown as the console "Live feed" | Trust Console |
+| Trust Console tiles | Reports, Cases, Outbreaks, Alerts (simulated) | Trust Console (demo key) |
+
+Nothing is sent or published automatically.
+
+## What it will not do
+- Ask for passwords, one-time codes or card numbers. The Pre-chat and knowledge articles tell customers not to share them.
+- Call a message "safe". The word is not in any verdict or knowledge text.
+- Confirm more than one notice with a Proof Code. It confirms the code, not the notice text.
+- Show an outbreak warning without a person's approval.
+- Send real SMS or email. Alerts are simulated; nobody is contacted.
+- Guess when it cannot help. Off-topic questions get a standard reply that points to a person.
+
+## Beyond the tutorial
+| Built | Where |
+|---|---|
+| Own API on Netlify Functions + Netlify Blobs | `api/`, `netlify/` |
+| Deterministic verdict rules, never model text | `api/src/verdict.ts` |
+| Outbreak logic over distinct chat sessions; official senders never count | `api/src/outbreak.ts`, `api/src/handlers.ts`, `api/src/sender.ts` |
+| Trust Console with human approval | `console/trust.html`, `api/src/console.ts` |
+| Proof Codes (demo-only) | `api/src/proofcode.ts`, `api/src/fixtures.ts` |
+| Second company config (Examplia Bank, in eGain); a third config (Examplia Mobile) is API-only | `api/src/companies/` |
+| Tests and harness: 296 of 296 tests in 15 files pass; `scripts/harness_check.py` PASSED (2026-11-12) | `api/test/`, `scripts/` |
 
 ## Architecture
 ```mermaid
@@ -95,6 +144,7 @@ Note: After creation the eGain settings box shows an empty URL field, but the De
 ## Known limits
 - Paste the real message as the FIRST message in the chat. If a customer first types something else, that sentence is checked as the message.
 - Proof Code verification confirms the code (one notice). It does not compare the notice text.
+- Questions about restoring power after a disconnection get the out-of-scope reply with a hand-off to a person; questions about how disconnection works are answered.
 - The scam rules are deliberately narrow and deterministic. A message with none of the listed signs, such as "Your bill is overdue. Reply YES to pay.", is not flagged. The reply then says "no matching notice" and "do not act yet".
 - The rules are narrow. On our own 20-sample set (written by us after review, not an independent evaluation; `api/test/sample-set.test.ts`) the result before the fix was 10 of 10 genuine notices flagged and 10 of 10 scams missed; after the fix it is 0 genuine flagged and 0 scams missed. The set was used to write the fix, so it does not measure how the rules do on new messages.
 - Proof Codes are demo-only: static, reusable and guessable (10,000 possible codes per company). A production design needs per-notice one-time codes and rate limiting.
@@ -123,7 +173,7 @@ These chat paths are the owner's own test steps. They cannot be re-checked from 
 1. Paste the suspicious message as the FIRST chat message.
 2. Each workflow runs once per chat, so start a new chat after a result.
 3. To report: start a new chat, type "Report a suspicious message" as the first message, then give the sender, then answer Yes.
-4. Other first messages that work: "I already paid" (Open Case); "I have a Proof Code", then `NP-4821`; "I want to talk to a human agent" (Escalation); a knowledge question such as "What should I do if my power is disconnected for non-payment?"
+4. Other first messages that work: "I already paid" (Open Case); "I have a Proof Code", then `NP-4821`; "I want to talk to a human agent" (Escalation); a knowledge question such as "How does disconnection for non-payment work?", "How can I pay my bill safely?", "Does Northline ask for passwords or one-time codes?" or "Will Northline ever call me from a mobile number?"
 5. Bank example: "Examplia Bank security: confirm your password and username to unlock your account.", then sender "unknown".
 
 ## Measured facts
