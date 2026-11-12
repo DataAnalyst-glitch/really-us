@@ -141,7 +141,26 @@ Note: After creation the eGain settings box shows an empty URL field, but the De
 - Demo Link (eGain agent): https://ai.egain.cloud/d3y6/system/web/apps/aiagent/demo.html?agentId=714122e0-9c7e-4143-8554-12afacbf3728&backgroundUrl=https://cdn.aiagent.egain.cloud/TMPRODB52840291/screenshots/7ac7046c-bc4b-4b04-b0af-a67ce25d3f2c.png
 - Demo site and API: https://really-us-verifier.netlify.app (Trust Console at `/trust.html`, needs the demo key)
 
+## Live validation on the published agent (12–13 Nov 2026)
+
+Run by hand in the published Demo Link (and Verify + Escalation also in eGain Test AI Agent). API unit tests are separate (see Measured facts).
+
+| Check | Result |
+| --- | --- |
+| Verify: power-cut scam text, sender unknown | Matches scam signs, 3 reasons, 1 next step |
+| Proof Code NP-4821 | Genuine notice found (one notice only) |
+| Report a suspicious message | RPT receipt |
+| Open Case ("I already paid") | CASE number + safe steps |
+| Escalation ("I want to talk to a human agent") | Call / Email the fraud desk |
+| Examplia Bank verify | Matches scam signs |
+| Outbreak chain | 3 chat sessions reported, a person approved in the Trust Console, next check of +1 555 0177 shows the heads-up |
+| T24, new rules from PR #13 (13 Nov) | 6/6 pass: Zelle/Cash App, "in 20 minutes" + call a number, verification code, IP link + log in to restore, gift voucher -> Matches scam signs; genuine notice with Proof Code -> no known scam patterns, Genuine notice found |
+
+Not run on the published agent: API-down behaviour. The full T1–T23 matrix in docs/TEST_PLAN.md was not re-run end to end after the intents were rewired on 12 Nov; the rows above are what was checked live.
+
 ## Known limits
+
+- Outbreaks count distinct chat sessions, not verified people; one person opening three chats could trigger a suspected outbreak. This is why a person must approve every outbreak before any warning is shown.
 - Paste the real message as the FIRST message in the chat. If a customer first types something else, that sentence is checked as the message.
 - Proof Code verification confirms the code (one notice). It does not compare the notice text.
 - Questions about restoring power after a disconnection get the out-of-scope reply with a hand-off to a person; questions about how disconnection works are answered.
