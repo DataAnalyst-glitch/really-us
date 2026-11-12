@@ -132,8 +132,8 @@ Verdicts come from deterministic rules in the API, never from model text. Writes
 | Trust Console (`console/trust.html`) and demo home page (`console/index.html`) | Running in production; outbreak approval and draft approval done in it |
 | eGain agent and workflows | Published and run in chat (owner-verified 2026-11-10). Facts are recorded in `egain/` and `docs/TEST_PLAN.md`; they cannot be re-checked from this repo |
 | Second fictional company (Examplia Bank) | Works in eGain through the Process "Verify Bank Message" and the intent "Check a message from my bank" (owner-verified 2026-11-10). Verify flow only; report, case and Proof Code flows are Northline only. Same agent and same Pre-chat greeting, which is written for Northline |
-| Full test run (T1-T23) on eGain | Not done. Only the chats listed in `docs/TEST_PLAN.md` under "Run on 2026-11-10" were run |
-| Video, final description, submission channel, participant info, license | Not done |
+| Full test run (T1-T23) on eGain | Not re-run end to end. Core flows and T24 (6/6) were checked live on the published agent on 12-13 Nov; see "Live validation on the published agent" below |
+| Video, final description, submission, license | Done: 1-minute video https://youtu.be/PRNmeJox_NE, Devpost and eGain forms submitted 12-13 Nov 2026, MIT license |
 
 ## Live URLs
 Note: After creation the eGain settings box shows an empty URL field, but the Demo Link itself works, so the link is kept in this repository.

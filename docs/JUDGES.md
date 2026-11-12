@@ -1,4 +1,7 @@
 # Judge guide
+
+> **Update 13 Nov 2026.** Video: https://youtu.be/PRNmeJox_NE. Submitted on Devpost and the eGain form. Core flows and T24 (6/6) were re-checked live on the published agent; see the README section "Live validation on the published agent". Older test statuses below were not re-run.
+
 Status values: PLANNED, BUILT, VERIFIED. Update with evidence links as work completes.
 
 ## Rule-to-evidence map
