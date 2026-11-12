@@ -3,7 +3,7 @@
 
 People reported losing $3.5 billion to impostor scams in the US in 2025, nearly 1 in 3 fraud reports ([U.S. FTC, June 2026](https://www.ftc.gov/news-events/news/press-releases/2026/06/ftc-data-show-people-reported-losing-3-point-5-billion-imposter-scams-2025)).
 
-- **Demo video:** VIDEO_URL_HERE
+- **Demo video:** https://youtu.be/PRNmeJox_NE
 - **Demo Link (eGain agent, opens without a code):** [open the chat](https://ai.egain.cloud/d3y6/system/web/apps/aiagent/demo.html?agentId=714122e0-9c7e-4143-8554-12afacbf3728&backgroundUrl=https://cdn.aiagent.egain.cloud/TMPRODB52840291/screenshots/7ac7046c-bc4b-4b04-b0af-a67ce25d3f2c.png)
 - **Trust Console:** https://really-us-verifier.netlify.app/trust.html (demo key on email request, see "Testing")
 
@@ -25,7 +25,7 @@ lets them ask the only party that knows: the company named in the message.
 |---|---|
 | Try the agent | [Demo Link](https://ai.egain.cloud/d3y6/system/web/apps/aiagent/demo.html?agentId=714122e0-9c7e-4143-8554-12afacbf3728&backgroundUrl=https://cdn.aiagent.egain.cloud/TMPRODB52840291/screenshots/7ac7046c-bc4b-4b04-b0af-a67ce25d3f2c.png) (opens without a code) |
 | See the live demo site | [https://really-us-verifier.netlify.app](https://really-us-verifier.netlify.app) |
-| See the 1-minute video | VIDEO_URL_HERE |
+| See the 1-minute video | https://youtu.be/PRNmeJox_NE |
 | Check every rule against evidence | [docs/JUDGES.md](docs/JUDGES.md) |
 | See test results | [docs/TEST_PLAN.md](docs/TEST_PLAN.md) |
 | Understand the design | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
@@ -39,7 +39,7 @@ lets them ask the only party that knows: the company named in the message.
 | Action & good judgment (25) | Writes need `confirmed=true` and an `idempotency_key`; three verdicts only; outbreak warning needs a person's approval (`api/src/handlers.ts`, `api/src/outbreak.ts`) | Report a sender, answer Yes or No; approve an outbreak in the Trust Console |
 | Effective use of eGain (20) | Knowledge, Pre-chat, Process workflows on intents, Escalation, API calls with an External Credential (`egain/`, `docs/JUDGES.md`) | Demo Link; "I want to talk to a human agent" |
 | Creativity & customer experience (15) | Proof Code on a real notice; "Heads-up" for the next customer; second company on the same API | `I have a Proof Code`, then `NP-4821` |
-| Demo video & storytelling (15) | Video: VIDEO_URL_HERE; story in `docs/DESIGN.md` | Watch the video |
+| Demo video & storytelling (15) | Video: https://youtu.be/PRNmeJox_NE; story in `docs/DESIGN.md` | Watch the video |
 
 ## Feature tour
 | Feature | What it does | First message to try |
