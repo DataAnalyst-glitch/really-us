@@ -1,4 +1,7 @@
 # Test plan
+
+> **Update 13 Nov 2026.** After the eGain intents were rewired on 12 Nov, the core flows were re-checked by hand on the published agent (verify, Proof Code NP-4821, report, open case, escalation, Examplia Bank, outbreak chain with human approval) and T24 (new rules from PR #13) passed 6/6, including a genuine-notice control. Results are in the README section "Live validation on the published agent". Rows below that still show older dates or NOT RUN were not re-run; API-down behaviour remains NOT RUN.
+
 Assert on state, not only wording. Status: NOT RUN, PASS, FAIL. Record date and surface.
 
 | ID | Case | Expected state | API | eGain Test | Published |
